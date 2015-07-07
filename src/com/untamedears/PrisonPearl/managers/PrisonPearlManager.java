@@ -142,6 +142,7 @@ public class PrisonPearlManager implements Listener {
 				stack.setAmount(stack.getAmount() - 1);
 				inv.setItem(stacknum, stack);
 			} else { // no empty slot?
+				inv.clear(stacknum); // clear before drop
 				dropStack = new ItemStack(Material.ENDER_PEARL, stack.getAmount() - 1);
 				pearlnum = stacknum; // then overwrite his stack of pearls
 			}
