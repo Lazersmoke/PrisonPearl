@@ -1,6 +1,6 @@
-name: PrisonPearl
+name: ${project.name}
 main: com.untamedears.PrisonPearl.PrisonPearlPlugin
-version: 2.4.1
+version: ${project.version}
 softdepend: [NameLayer, CombatTag, WorldBorder, CombatTagPlus]
 commands:
    pplocate:
