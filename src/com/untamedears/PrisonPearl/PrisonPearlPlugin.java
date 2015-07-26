@@ -21,6 +21,8 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minelink.ctplus.compat.api.NpcIdentity;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -562,6 +564,12 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 //			if (!realName.equals("")) {
 //				playerName = realName;
 //			}
+		}
+		else if (combatTagManager.isCombatTagPlusNPC(player)){
+			NpcIdentity iden = combatTagManager.getCombatTagPlusNPCIdentity(player);
+			uuid = iden.getId();
+			playerName = iden.getName();
+			log.info("NPC Player: " + playerName + ", ID: " + uuid);
 		}
 		
 		PrisonPearl pp = pearls.getByImprisoned(uuid); // find out if the player is imprisoned

@@ -38,15 +38,12 @@ class CombatTagListener implements Listener {
     
     @EventHandler
     public void onNpcDespawnPlus(net.minelink.ctplus.event.NpcDespawnEvent event){
+    	net.minelink.ctplus.event.NpcDespawnReason reason = event.getDespawnReason();
     	Npc npc = event.getNpc();
-    	
     	Player p = npc.getEntity();
-    	
-    	if (p.isOnline())
-    		return;
-    	UUID plruuid = p.getUniqueId();
     	Location loc = p.getLocation();
-    	
-    	pearlman_.handleNpcDespawn(plruuid, loc);
+    	if (reason == net.minelink.ctplus.event.NpcDespawnReason.DESPAWN){
+        	pearlman_.handleNpcDespawn(p.getUniqueId(), loc);
+    	}
     }
 }
