@@ -173,7 +173,7 @@ public class PrisonPearlManager implements Listener {
 		pp.markMove();
 
 		// Create the inventory item
-		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1, pp.getID());
+		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
 		ItemMeta im = is.getItemMeta();
 		// Rename pearl to that of imprisoned player
 		im.setDisplayName(name);
@@ -243,7 +243,7 @@ public class PrisonPearlManager implements Listener {
 			return null;
 
 		if (item.getType() == Material.ENDER_PEARL && item.getDurability() != 0) {
-			PrisonPearl pp = pearls.getByID(item.getDurability());
+			PrisonPearl pp = pearls.getPearlbyItemStack(item);
 
 			if (pp == null) {
 				return new ItemStack(Material.ENDER_PEARL, 1);
@@ -774,7 +774,7 @@ public class PrisonPearlManager implements Listener {
 		if (isMercury){
 			String message = "";
 			Location loc = pp.getLocation();
-			message = type.name() + " " + pp.getImprisonedId().toString() + " " + pp.getImprisonedName() + " " + pp.getID() + " " +
+			message = type.name() + " " + pp.getImprisonedId().toString() + " " + pp.getImprisonedName() + " " +
 			loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
 			
 			Player p;
@@ -785,4 +785,15 @@ public class PrisonPearlManager implements Listener {
 		}
 	}
 
+	public boolean isItemStackPrisonPearl(PrisonPearl pp, ItemStack stack) {
+		if (!stack.hasItemMeta())
+			return false;
+		if (!stack.getItemMeta().hasLore())
+			return false;
+		List<String> lore = stack.getItemMeta().getLore();
+		if (lore.size() != 2)
+			return false;
+		String uuid = lore.get(1).split(" ")[1];
+		return uuid.equals(pp.getImprisonedId().toString());
+	}
 }

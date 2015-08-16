@@ -852,7 +852,7 @@ class PrisonPearlCommands implements CommandExecutor {
             if (pp != null) {
                 Inventory inv = player.getInventory();
                 for (Entry<Integer, ? extends ItemStack> entry : inv.all(Material.ENDER_PEARL).entrySet()) {
-                    if (entry.getValue().getDurability() == pp.getID())
+                    if (pearls.isPrisonPearl(entry.getValue()))
                         return entry.getKey();
                 }
             }

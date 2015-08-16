@@ -56,16 +56,15 @@ public class MercuryListener implements Listener{
 		PrisonPearlEvent.Type type = PrisonPearlEvent.Type.valueOf(parts[0]);
 		UUID id = UUID.fromString(parts[1]);
 		String name = parts[2];
-		short damage = Short.parseShort(parts[3]);
-		FakeLocation loc = new FakeLocation(parts[4], Double.parseDouble(parts[5]), Double.parseDouble(parts[6]),
-				Double.parseDouble(parts[7]));
+		FakeLocation loc = new FakeLocation(parts[3], Double.parseDouble(parts[4]), Double.parseDouble(parts[5]),
+				Double.parseDouble(parts[6]));
 		String player = null;
-		if (parts.length == 9)
-			player = parts[8];
+		if (parts.length == 8)
+			player = parts[7];
 		
 		if (type.equals(PrisonPearlEvent.Type.NEW)){
 			
-			PrisonPearl pp = new PrisonPearl(damage, name, id, loc);
+			PrisonPearl pp = new PrisonPearl(name, id, loc);
 			pearls.addPearl(pp);
 			return;
 		}
