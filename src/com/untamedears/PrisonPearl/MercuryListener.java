@@ -59,12 +59,13 @@ public class MercuryListener implements Listener{
 		FakeLocation loc = new FakeLocation(parts[3], Double.parseDouble(parts[4]), Double.parseDouble(parts[5]),
 				Double.parseDouble(parts[6]));
 		String player = null;
-		if (parts.length == 8)
-			player = parts[7];
+		int unique = Integer.parseInt(parts[7]);
+		if (parts.length == 9)
+			player = parts[8];
 		
 		if (type.equals(PrisonPearlEvent.Type.NEW)){
 			
-			PrisonPearl pp = new PrisonPearl(name, id, loc);
+			PrisonPearl pp = new PrisonPearl(name, id, loc, unique);
 			pearls.addPearl(pp);
 			return;
 		}

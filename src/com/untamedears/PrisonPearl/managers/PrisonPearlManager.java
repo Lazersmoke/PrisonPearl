@@ -181,11 +181,11 @@ public class PrisonPearlManager implements Listener {
 		// Gives pearl lore that says more info when hovered over
 		lore.add(name + " is held within this pearl");
 		lore.add("UUID: "+pp.getImprisonedId());
+		lore.add("Unique: " + pp.getUniqueIdentifier());
 		// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
 		im.addEnchant(Enchantment.DURABILITY, 1, true);
 		im.setLore(lore);
 		is.setItemMeta(im);
-		is.removeEnchantment(Enchantment.DURABILITY);
 		// Give it to the imprisoner
 		inv.setItem(pearlnum, is);
 		// Reason for edit: Gives pearl enchantment effect (distinguishable, unstackable) Gives name of prisoner in inventory.
@@ -791,9 +791,10 @@ public class PrisonPearlManager implements Listener {
 		if (!stack.getItemMeta().hasLore())
 			return false;
 		List<String> lore = stack.getItemMeta().getLore();
-		if (lore.size() != 2)
+		if (lore.size() != 3)
 			return false;
 		String uuid = lore.get(1).split(" ")[1];
-		return uuid.equals(pp.getImprisonedId().toString());
+		int unique = Integer.parseInt(lore.get(2).split(" ")[1]);
+		return uuid.equals(pp.getImprisonedId().toString()) && unique == pp.getUniqueIdentifier();
 	}
 }

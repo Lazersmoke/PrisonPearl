@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,7 +47,6 @@ public class PrisonPearlStorage implements SaveLoad {
 	private final Map<UUID, PrisonPearl> pearls_byimprisoned;
 	
 	public static List<UUID> transferedPlayers = new ArrayList<UUID>();
-	private short nextid;
 	
 	private long lastFeed = 0;
 	
@@ -62,7 +62,6 @@ public class PrisonPearlStorage implements SaveLoad {
 				
 		this.plugin = plugin;
 		pearls_byimprisoned = new HashMap<UUID, PrisonPearl>();
-		nextid = 1;
 	}
 	
 	public boolean isDirty() {
@@ -101,6 +100,8 @@ public class PrisonPearlStorage implements SaveLoad {
 				continue;
 			}
 			String parts[] = line.split(" ");
+			if (parts.length <= 1)
+				continue;
 			UUID imprisoned = UUID.fromString(parts[0]);
 			Location loc = new Location(Bukkit.getWorld(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
 			String name = "";
@@ -108,10 +109,11 @@ public class PrisonPearlStorage implements SaveLoad {
 				name = NameAPI.getCurrentName(imprisoned);
 			else
 				name = Bukkit.getOfflinePlayer(imprisoned).getName();
-			PrisonPearl pp = PrisonPearl.makeFromLocation(name, imprisoned, loc);
-			if (parts.length != 5) {
+			int unique = Integer.parseInt(parts[5]);
+			PrisonPearl pp = PrisonPearl.makeFromLocation(name, imprisoned, loc, unique);
+			if (parts.length != 6) {
 				String motd = "";
-				for (int i = 5; i < parts.length; i++) {
+				for (int i = 6; i < parts.length; i++) {
 					motd = motd.concat(parts[i] + " ");
 				}
 				pp.setMotd(motd);
@@ -153,6 +155,8 @@ public class PrisonPearlStorage implements SaveLoad {
 			br.append(" ");
 			br.append(String.valueOf(loc.getBlockZ()));
 			br.append(" ");
+			br.append(String.valueOf(pp.getUniqueIdentifier()));
+			br.append(" ");
 			br.append(pp.getMotd());
 			br.append("\n");
 		}
@@ -169,7 +173,8 @@ public class PrisonPearlStorage implements SaveLoad {
 	}
 	
 	public PrisonPearl newPearl(String imprisonedName, UUID imprisonedId, Player imprisoner) {
-		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner);
+		Random rand = new Random();
+		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner, rand.nextInt(1000));
 		addPearl(pp);
 		return pp;
 	}
@@ -275,7 +280,7 @@ public class PrisonPearlStorage implements SaveLoad {
 	}
 	
 	public PrisonPearl getByItemStack(ItemStack item) {
-		if (item == null || item.getType() != Material.ENDER_PEARL || item.getDurability() == 0)
+		if (item == null || item.getType() != Material.ENDER_PEARL || item.getDurability() != 0)
 			return null;
 		else
 			return getPearlbyItemStack(item);
@@ -338,40 +343,39 @@ public class PrisonPearlStorage implements SaveLoad {
 		final UUID prisonerId = pp.getImprisonedId();
 		final String prisoner = Bukkit.getOfflinePlayer(prisonerId).getName();
 		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
-		int pearlslot = inv.first(is);
-		if (pearlslot < 0) {
-			// If the pearl has been converted, first won't return it here
-			// as the metadata doesn't match.
-			return false;
-		}
-		ItemStack existing_is = inv.getItem(pearlslot);
-		if (existing_is != null) {
-			ItemMeta existing_meta = existing_is.getItemMeta();
-			if (existing_meta != null) {
-				String existing_name = existing_meta.getDisplayName();
-				List<String> lore = existing_meta.getLore();
-				if (existing_name != null &&
-					existing_name.compareTo(prisoner) == 0 && lore != null && lore.size() == 2) {
-					return true;
+		for (ItemStack existing_is: inv.getContents()) {
+			if (existing_is == null || existing_is.getType() != Material.ENDER_PEARL)
+				continue;
+			int pearlslot = inv.first(existing_is);
+			existing_is.setDurability((short) 0);
+			if (existing_is != null) {
+				ItemMeta existing_meta = existing_is.getItemMeta();
+				if (existing_meta != null) {
+					String existing_name = existing_meta.getDisplayName();
+					List<String> lore = existing_meta.getLore();
+					if (existing_name != null &&
+							existing_name.compareTo(prisoner) == 0 && lore != null && lore.size() == 3) {
+						return true;
+					}
 				}
 			}
+			ItemMeta im = is.getItemMeta(); 
+			// Rename pearl to that of imprisoned player 
+			im.setDisplayName(prisoner);
+			List<String> lore = new ArrayList<String>(); 
+			lore.add(prisoner + " is held within this pearl");
+			lore.add("UUID: " + pp.getImprisonedId().toString());
+			lore.add("Unique: " + pp.getUniqueIdentifier());
+			// Given enchantment effect
+			// Durability used because it doesn't affect pearl behaviour
+			im.addEnchant(Enchantment.DURABILITY, 1, true);
+			im.setLore(lore);
+			is.setItemMeta(im);
+			inv.clear(pearlslot);
+			inv.setItem(pearlslot, is);
+			return true;
 		}
-		existing_is.setDurability((short) 0);
-		ItemMeta im = is.getItemMeta(); 
-		// Rename pearl to that of imprisoned player 
-		im.setDisplayName(prisoner);
-		List<String> lore = new ArrayList<String>(); 
-		lore.add(prisoner + " is held within this pearl");
-		lore.add("UUID: " + pp.getImprisonedId().toString());
-		// Given enchantment effect
-		// Durability used because it doesn't affect pearl behaviour
-		im.addEnchant(Enchantment.DURABILITY, 1, true);
-		im.setLore(lore);
-		is.setItemMeta(im);
-		is.removeEnchantment(Enchantment.DURABILITY); 
-		inv.clear(pearlslot);
-		inv.setItem(pearlslot, is);
-		return true;
+		return false;
 	}
 
 	public String feedPearls(PrisonPearlManager pearlman){
@@ -404,6 +408,9 @@ public class PrisonPearlStorage implements SaveLoad {
 			if (loc instanceof FakeLocation) { // Not on server
 				continue; // Other server will handle feeding
 			}
+			if (!upgradePearl(inv[0], pp) && inv[1] != null) {
+				upgradePearl(inv[1], pp);
+			}
 			if (retval == HolderStateToInventory_BADCONTAINER) {
 				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, container was corrupt.";
 				pearlman.freePearl(pp, reason);
@@ -419,9 +426,6 @@ public class PrisonPearlStorage implements SaveLoad {
 				log+="\n freed:"+prisonerId+",reason:"+"maxDistance";
 				freedpearls++;
 				continue;
-			}
-			if (!upgradePearl(inv[0], pp) && inv[1] != null) {
-				upgradePearl(inv[1], pp);
 			}
 			if (inactive_seconds != 0 || inactive_hours != 0 || inactive_days != 0) {
 				long inactive_time = pp.getImprisonedOfflinePlayer().getLastPlayed();
@@ -517,7 +521,7 @@ public class PrisonPearlStorage implements SaveLoad {
     	if (!stack.getItemMeta().hasLore())
     		return null;
     	List<String> lore = stack.getItemMeta().getLore();
-    	if (lore.size() != 2)
+    	if (lore.size() != 3)
     		return null;
     	UUID uuid = UUID.fromString(lore.get(1).split(" ")[1]);
     	return pearls_byimprisoned.get(uuid);

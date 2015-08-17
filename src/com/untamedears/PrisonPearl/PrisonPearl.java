@@ -64,32 +64,36 @@ public class PrisonPearl {
 	private String motd = "";
 	private boolean pearlOnCursor = false;
 	private long lastMoved = 0;
+	private final int unique;
 	private PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 	
-	public PrisonPearl(String imprisonedName, UUID imprisonedId, Player holderplayer) {
+	public PrisonPearl(String imprisonedName, UUID imprisonedId, Player holderplayer, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(holderplayer));
+		this.unique = unique;
 	}
 	
-    public PrisonPearl(String imprisonedName, UUID imprisonedId, Location blocklocation) {
+    public PrisonPearl(String imprisonedName, UUID imprisonedId, Location blocklocation, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
+		this.unique = unique;
 	}
     
-    public PrisonPearl(String imprisonedName, UUID imprisonedId, FakeLocation blocklocation) {
+    public PrisonPearl(String imprisonedName, UUID imprisonedId, FakeLocation blocklocation, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
+		this.unique = unique;
 	}
 
-	public static PrisonPearl makeFromLocation(String imprisonedName, UUID imprisonedId, Location loc) {
+	public static PrisonPearl makeFromLocation(String imprisonedName, UUID imprisonedId, Location loc, int unique) {
 		if (imprisonedId == null || loc == null)
 			return null;
 		BlockState bs = loc.getBlock().getState();
 		if (bs instanceof InventoryHolder)
-			return new PrisonPearl(imprisonedName, imprisonedId, loc);
+			return new PrisonPearl(imprisonedName, imprisonedId, loc, unique);
 		else
 			return null;
 	}
@@ -431,5 +435,9 @@ public class PrisonPearl {
             messagedPlayers.add(otherNameLc);
         }
         return messagedPlayers;
+    }
+    
+    public int getUniqueIdentifier() {
+    	return unique;
     }
 }

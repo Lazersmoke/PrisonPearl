@@ -388,12 +388,14 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			BufferedWriter brr = new BufferedWriter(new OutputStreamWriter(fos));
 			
 			String line = "";
+			Random rand = new Random();
 			while ((line = br.readLine()) != null) {
 				StringBuilder newLine = new StringBuilder();
 				String[] parts = line.split(" ");
 				for (int x = 1; x < parts.length; x++)
 					newLine.append(parts[x] + " ");
-				brr.write(newLine.toString() + "\n");
+				newLine.append(rand.nextInt(1000));
+				brr.write(newLine.toString() +  "\n");
 			}
 			brr.flush();
 			brr.close();
@@ -405,7 +407,6 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void saveAll(boolean force) {
@@ -1218,7 +1219,8 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
     	for (UUID uuid: uuids){
     		PrisonPearl pp = pearls.getByImprisoned(uuid);
     		Location loc = pp.getLocation();
-    		String message = uuid.toString() + " " + loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
+    		String message = uuid.toString() + " " + loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " " +
+    				pp.getUniqueIdentifier() + " " + pp.getMotd();
     		MercuryAPI.instance.sendMessage(message, "PrisonPearlMove");
     	}
     }
