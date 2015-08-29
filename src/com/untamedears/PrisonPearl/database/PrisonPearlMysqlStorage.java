@@ -44,12 +44,12 @@ public class PrisonPearlMysqlStorage {
 
 	public void initializeTables() {
 		db.execute("create table if not exists PrisonPearls( "
-				+ "ids tinyint not null," 
 				+ "uuid varchar(36) not null,"
 				+ "world varchar(255) not null," 
 				+ "x int not null,"
 				+ "y int not null," 
 				+ "z int not null,"
+				+ "uq int not null,"
 				+ "motd varchar(255) not null," 
 				+ "primary key ids_id(ids));");
 		db.execute("create table if not exists PrisonPearlPortaled("
@@ -77,7 +77,7 @@ public class PrisonPearlMysqlStorage {
 	private PreparedStatement updateLastRestart, getLastRestart;
 	
 	public void initializeStatements() {
-		addPearl = db.prepareStatement("insert into PrisonPearls(ids, uuid, world, x, y, z, motd)"
+		addPearl = db.prepareStatement("insert into PrisonPearls(uuid, world, x, y, z, uq, motd)"
 						+ "values (?, ?, ?, ?, ?, ?, ?);");
 		getPearl = db.prepareStatement("select * from PrisonPearls where uuid = ?;");
 		getAllPearls = db.prepareStatement("select * from PrisonPearls;");
@@ -114,12 +114,12 @@ public class PrisonPearlMysqlStorage {
 
 	public void addPearl(PrisonPearl pp) {
 		try {
-			addPearl.setShort(1, pp.getID());
-			addPearl.setString(2, pp.getImprisonedId().toString());
-			addPearl.setString(3, pp.getLocation().getWorld().getName());
-			addPearl.setInt(4, pp.getLocation().getBlockX());
-			addPearl.setInt(5, pp.getLocation().getBlockY());
-			addPearl.setInt(6, pp.getLocation().getBlockZ());
+			addPearl.setString(1, pp.getImprisonedId().toString());
+			addPearl.setString(2, pp.getLocation().getWorld().getName());
+			addPearl.setInt(3, pp.getLocation().getBlockX());
+			addPearl.setInt(4, pp.getLocation().getBlockY());
+			addPearl.setInt(5, pp.getLocation().getBlockZ());
+			addPearl.setInt(6, pp.getUniqueIdentifier());
 			addPearl.setString(7, pp.getMotd());
 			addPearl.execute();
 		} catch (SQLException e) {
@@ -134,20 +134,20 @@ public class PrisonPearlMysqlStorage {
 			ResultSet set = getPearl.executeQuery();
 			if (!set.next())
 				return null;
-			short id = set.getShort("ids");
 			World world = Bukkit.getWorld(set.getString("world"));
 			int x = set.getInt("x"), y = set.getInt("y"), z = set.getInt("z");
 			String motd = set.getString("motd");
 			String name = "";
+			int unique = set.getInt("uq");
 			if (isNameLayer)
 				name = NameAPI.getCurrentName(uuid);
 			else
 				name = Bukkit.getOfflinePlayer(uuid).getName();
 			PrisonPearl pp = null;
 			if (world == null)
-				pp = new PrisonPearl(id, name, uuid, new FakeLocation(set.getString("world"), x, y, z));
+				pp = new PrisonPearl(name, uuid, new FakeLocation(set.getString("world"), x, y, z), unique);
 			else 
-				pp = new PrisonPearl(id, name, uuid, new Location(world, x, y, z));
+				pp = new PrisonPearl(name, uuid, new Location(world, x, y, z), unique);
 			pp.setMotd(motd);
 			return pp;
 		} catch (SQLException e) {
@@ -162,22 +162,22 @@ public class PrisonPearlMysqlStorage {
 		try {
 			ResultSet set = getAllPearls.executeQuery();
 			while (set.next()) {
-				short id = set.getShort("ids");
 				World world = Bukkit.getWorld(set.getString("world"));
 				int x = set.getInt("x"), y = set.getInt("y"), z = set
 						.getInt("z");
 				String motd = set.getString("motd");
 				UUID uuid = UUID.fromString(set.getString("uuid"));
 				String name = "";
+				int unique = set.getInt("uq");
 				if (isNameLayer)
 					name = NameAPI.getCurrentName(uuid);
 				else
 					name = Bukkit.getOfflinePlayer(uuid).getName();
 				PrisonPearl pp = null;
 				if (world == null)
-					pp = new PrisonPearl(id, name, uuid, new FakeLocation(set.getString("world"), x, y, z));
+					pp = new PrisonPearl(name, uuid, new FakeLocation(set.getString("world"), x, y, z), unique);
 				else 
-					pp = new PrisonPearl(id, name, uuid, new Location(world, x, y, z));
+					pp = new PrisonPearl(name, uuid, new Location(world, x, y, z), unique);
 				pp.setMotd(motd);
 				pearls.add(pp);
 			}

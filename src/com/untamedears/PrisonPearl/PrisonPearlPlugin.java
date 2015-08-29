@@ -120,6 +120,7 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		 // updates files to uuid
 		try {
 			updateToUUID();
+			updateToRemoveDur();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -179,7 +180,7 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		
 		if (isMercury){
 			getServer().getPluginManager().registerEvents(new MercuryListener(this, pearls), this);
-			MercuryAPI.instance.registerPluginMessageChannel(this, MercuryListener.channels);
+			MercuryAPI.instance.registerPluginMessageChannel(MercuryListener.channels);
 			Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 
 				@Override
@@ -367,6 +368,44 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			brr.close();
 			br.close();
 			file.delete();
+		}
+	}
+	
+	private void updateToRemoveDur() {
+		File file = getPrisonPearlsFile();
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(file);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+			try {
+				Integer.parseInt(br.readLine());
+			} catch (NumberFormatException e) {
+				br.close();
+				return;
+			}
+			
+			FileOutputStream fos = new FileOutputStream(file);
+			BufferedWriter brr = new BufferedWriter(new OutputStreamWriter(fos));
+			
+			String line = "";
+			Random rand = new Random();
+			while ((line = br.readLine()) != null) {
+				StringBuilder newLine = new StringBuilder();
+				String[] parts = line.split(" ");
+				for (int x = 1; x < parts.length; x++)
+					newLine.append(parts[x] + " ");
+				newLine.append(rand.nextInt(1000));
+				brr.write(newLine.toString() +  "\n");
+			}
+			brr.flush();
+			brr.close();
+			br.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -1180,7 +1219,8 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
     	for (UUID uuid: uuids){
     		PrisonPearl pp = pearls.getByImprisoned(uuid);
     		Location loc = pp.getLocation();
-    		String message = uuid.toString() + " " + loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
+    		String message = uuid.toString() + " " + loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " " +
+    				pp.getUniqueIdentifier() + " " + pp.getMotd();
     		MercuryAPI.instance.sendMessage(message, "PrisonPearlMove");
     	}
     }

@@ -173,7 +173,7 @@ public class PrisonPearlManager implements Listener {
 		pp.markMove();
 
 		// Create the inventory item
-		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1, pp.getID());
+		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
 		ItemMeta im = is.getItemMeta();
 		// Rename pearl to that of imprisoned player
 		im.setDisplayName(name);
@@ -181,11 +181,11 @@ public class PrisonPearlManager implements Listener {
 		// Gives pearl lore that says more info when hovered over
 		lore.add(name + " is held within this pearl");
 		lore.add("UUID: "+pp.getImprisonedId());
+		lore.add("Unique: " + pp.getUniqueIdentifier());
 		// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
 		im.addEnchant(Enchantment.DURABILITY, 1, true);
 		im.setLore(lore);
 		is.setItemMeta(im);
-		is.removeEnchantment(Enchantment.DURABILITY);
 		// Give it to the imprisoner
 		inv.setItem(pearlnum, is);
 		// Reason for edit: Gives pearl enchantment effect (distinguishable, unstackable) Gives name of prisoner in inventory.
@@ -243,7 +243,7 @@ public class PrisonPearlManager implements Listener {
 			return null;
 
 		if (item.getType() == Material.ENDER_PEARL && item.getDurability() != 0) {
-			PrisonPearl pp = pearls.getByID(item.getDurability());
+			PrisonPearl pp = pearls.getPearlbyItemStack(item);
 
 			if (pp == null) {
 				return new ItemStack(Material.ENDER_PEARL, 1);
@@ -774,7 +774,7 @@ public class PrisonPearlManager implements Listener {
 		if (isMercury){
 			String message = "";
 			Location loc = pp.getLocation();
-			message = type.name() + " " + pp.getImprisonedId().toString() + " " + pp.getImprisonedName() + " " + pp.getID() + " " +
+			message = type.name() + " " + pp.getImprisonedId().toString() + " " + pp.getImprisonedName() + " " +
 			loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
 			
 			Player p;
@@ -785,4 +785,16 @@ public class PrisonPearlManager implements Listener {
 		}
 	}
 
+	public boolean isItemStackPrisonPearl(PrisonPearl pp, ItemStack stack) {
+		if (!stack.hasItemMeta())
+			return false;
+		if (!stack.getItemMeta().hasLore())
+			return false;
+		List<String> lore = stack.getItemMeta().getLore();
+		if (lore.size() != 3)
+			return false;
+		String uuid = lore.get(1).split(" ")[1];
+		int unique = Integer.parseInt(lore.get(2).split(" ")[1]);
+		return uuid.equals(pp.getImprisonedId().toString()) && unique == pp.getUniqueIdentifier();
+	}
 }

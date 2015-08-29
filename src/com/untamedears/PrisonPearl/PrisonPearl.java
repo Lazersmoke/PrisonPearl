@@ -2,6 +2,7 @@ package com.untamedears.PrisonPearl;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import com.untamedears.PrisonPearl.managers.PrisonPearlManager;
 
 public class PrisonPearl {
     public static final int HOLDER_COUNT = 5;
@@ -56,46 +59,43 @@ public class PrisonPearl {
     // Mostly used as a Deque, but clear() is used from LinkedList
     private LinkedList<Holder> holders = new LinkedList<Holder>();
 
-	private final short id;
 	private final String imprisonedName;
 	private final UUID imprisonedId;
 	private String motd = "";
 	private boolean pearlOnCursor = false;
 	private long lastMoved = 0;
+	private final int unique;
+	private PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 	
-	public PrisonPearl(short id, String imprisonedName, UUID imprisonedId, Player holderplayer) {
-		this.id = id;
+	public PrisonPearl(String imprisonedName, UUID imprisonedId, Player holderplayer, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(holderplayer));
+		this.unique = unique;
 	}
 	
-    public PrisonPearl(short id, String imprisonedName, UUID imprisonedId, Location blocklocation) {
-		this.id = id;
+    public PrisonPearl(String imprisonedName, UUID imprisonedId, Location blocklocation, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
+		this.unique = unique;
 	}
     
-    public PrisonPearl(short id, String imprisonedName, UUID imprisonedId, FakeLocation blocklocation) {
-		this.id = id;
+    public PrisonPearl(String imprisonedName, UUID imprisonedId, FakeLocation blocklocation, int unique) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
+		this.unique = unique;
 	}
 
-	public static PrisonPearl makeFromLocation(short id, String imprisonedName, UUID imprisonedId, Location loc) {
+	public static PrisonPearl makeFromLocation(String imprisonedName, UUID imprisonedId, Location loc, int unique) {
 		if (imprisonedId == null || loc == null)
 			return null;
 		BlockState bs = loc.getBlock().getState();
 		if (bs instanceof InventoryHolder)
-			return new PrisonPearl(id, imprisonedName, imprisonedId, loc);
+			return new PrisonPearl(imprisonedName, imprisonedId, loc, unique);
 		else
 			return null;
-	}
-
-	public short getID() {
-		return id;
 	}
 
 	public String getImprisonedName() {
@@ -177,14 +177,14 @@ public class PrisonPearl {
 			case ENDER_CHEST:
 				return "a chest";
 			default:
-				PrisonPearlPlugin.info("PrisonPearl " + id + " is inside an unknown block " + getHolderBlockState(holder).getType().toString());
+				PrisonPearlPlugin.info("PrisonPearl " + imprisonedId.toString() + " is inside an unknown block " + getHolderBlockState(holder).getType().toString());
 				return "an unknown block"; 
 			}
 		} else if (holder.supposedPearlLocation != null){
 			return "another server";
 		}
 		else {
-			PrisonPearlPlugin.info("PrisonPearl " + id + " has no player, item, nor location");
+			PrisonPearlPlugin.info("PrisonPearl " + imprisonedId.toString() + " has no player, item, nor location");
 			return "unknown"; 
 		}
 	}
@@ -204,7 +204,7 @@ public class PrisonPearl {
 			return holder.supposedPearlLocation;
 		}
 		else {
-			throw new RuntimeException("PrisonPearl " + id + " has no player, item, nor location");
+			throw new RuntimeException("PrisonPearl " + imprisonedId.toString() + " has no player, item, nor location");
 		}
 	}
 
@@ -267,7 +267,7 @@ public class PrisonPearl {
 					return HolderVerReason.IN_HAND;
 				}
 				ItemStack cursoritem = holder.player.getItemOnCursor();
-				if (cursoritem.getType() == Material.ENDER_PEARL && cursoritem.getDurability() == id)
+				if (cursoritem.getType() == Material.ENDER_PEARL && manager.isItemStackPrisonPearl(this, cursoritem))
 					return HolderVerReason.IN_HAND;
 				inv = holder.player.getInventory();
 				feedback.append(String.format("Not in %s's inventory", holder.player.getName()));
@@ -287,7 +287,7 @@ public class PrisonPearl {
 				inv = ((InventoryHolder)bs).getInventory();
 				for (HumanEntity viewer : inv.getViewers()) {
 					ItemStack cursoritem = viewer.getItemOnCursor();
-					if (cursoritem.getType() == Material.ENDER_PEARL && cursoritem.getDurability() == id)
+					if (cursoritem.getType() == Material.ENDER_PEARL && manager.isItemStackPrisonPearl(this, cursoritem))
 						feedback.append(String.format("In hand of %s viewing chest at (%d,%d,%d)",
 								viewer.getName(),
 								holder.blocklocation.getBlockX(),
@@ -307,7 +307,7 @@ public class PrisonPearl {
 				return HolderVerReason.NO_ITEM_PLAYER_OR_LOCATION;
 			}
 			for (ItemStack item : inv.all(Material.ENDER_PEARL).values()) {
-				if (item.getDurability() == id) {
+				if (manager.isItemStackPrisonPearl(this, item)) {
 					if (holder.blocklocation != null)
 						feedback.append(String.format("In inventory at (%d,%d,%d)",
 							holder.blocklocation.getBlockX(),
@@ -335,8 +335,8 @@ public class PrisonPearl {
 			HolderVerReason reason = verifyHolder(holder, verifier_log);
             if (reason.ordinal() > 5) {
 
-				sb.append(String.format("PP (%d, %s) passed verification for reason %s: %s",
-										id, getPlayerName(), reason.toString(), verifier_log.toString()));
+				sb.append(String.format("PP (%s) passed verification for reason %s: %s",
+										getPlayerName(), reason.toString(), verifier_log.toString()));
 				PrisonPearlPlugin.info(sb.toString());
 				
                 return true;
@@ -345,8 +345,8 @@ public class PrisonPearl {
 			}
             verifier_log.append(", ");
         }
-		sb.append(String.format("PP (%d, %s) failed verification for reason %s: %s",
-				id, getPlayerName(), failure_reason_log.toString(), verifier_log.toString()));
+		sb.append(String.format("PP (%s) failed verification for reason %s: %s",
+				getPlayerName(), failure_reason_log.toString(), verifier_log.toString()));
         PrisonPearlPlugin.info(sb.toString());
         return false;
     }
@@ -435,5 +435,9 @@ public class PrisonPearl {
             messagedPlayers.add(otherNameLc);
         }
         return messagedPlayers;
+    }
+    
+    public int getUniqueIdentifier() {
+    	return unique;
     }
 }
