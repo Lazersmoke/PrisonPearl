@@ -390,6 +390,8 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			String line = "";
 			Random rand = new Random();
 			while ((line = br.readLine()) != null) {
+				if(line.matches("lastFeed:([0-9]+)"))
+					continue;
 				StringBuilder newLine = new StringBuilder();
 				String[] parts = line.split(" ");
 				for (int x = 1; x < parts.length; x++) {
