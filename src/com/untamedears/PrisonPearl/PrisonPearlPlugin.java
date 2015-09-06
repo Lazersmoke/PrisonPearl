@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -384,8 +385,10 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 				return;
 			}
 			
-			FileOutputStream fos = new FileOutputStream(file);
-			BufferedWriter brr = new BufferedWriter(new OutputStreamWriter(fos));
+			File tempFile = new File(data, "temp.txt");
+			tempFile.createNewFile();
+			FileOutputStream fos = new FileOutputStream(tempFile);
+			PrintWriter brr = new PrintWriter(new OutputStreamWriter(fos), false);
 			
 			String line = "";
 			Random rand = new Random();
@@ -399,11 +402,13 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 					if (x == 5)
 						newLine.append(rand.nextInt(1000) + " ");
 				}
-				brr.write(newLine.toString() +  "\n");
+				brr.append(newLine.toString() +  "\n");
 			}
 			brr.flush();
 			brr.close();
 			br.close();
+			file.delete();
+			tempFile.renameTo(file);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

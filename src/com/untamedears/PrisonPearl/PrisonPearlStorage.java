@@ -111,12 +111,13 @@ public class PrisonPearlStorage implements SaveLoad {
 				name = Bukkit.getOfflinePlayer(imprisoned).getName();
 			int unique = Integer.parseInt(parts[5]);
 			PrisonPearl pp = PrisonPearl.makeFromLocation(name, imprisoned, loc, unique);
-			if (parts.length != 6) {
+			if (parts.length > 6) {
 				String motd = "";
 				for (int i = 6; i < parts.length; i++) {
 					motd = motd.concat(parts[i] + " ");
 				}
-				pp.setMotd(motd);
+				if (pp != null)
+					pp.setMotd(motd);
 			}
 			if (pp == null) {
 				System.err.println("PrisonPearl for " + imprisoned + " didn't validate, so is now set free. Chunks and/or prisonpearls.txt are corrupt");
