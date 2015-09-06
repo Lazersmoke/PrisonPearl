@@ -57,6 +57,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import vg.civcraft.mc.mercury.MercuryAPI;
+import vg.civcraft.mc.namelayer.NameAPI;
 
 import com.mojang.authlib.GameProfile;
 import com.untamedears.PrisonPearl.EnderExpansion;
@@ -70,12 +71,14 @@ public class PrisonPearlManager implements Listener {
 	private final PrisonPearlPlugin plugin;
 	private final PrisonPearlStorage pearls;
 	private EnderExpansion ee;
+	private boolean isNameLayer;
 	private boolean isMercury;
 
 	public PrisonPearlManager(PrisonPearlPlugin plugin, PrisonPearlStorage pearls, EnderExpansion ee) {
 		this.plugin = plugin;
 		this.pearls = pearls;
 		this.ee = ee;
+		isNameLayer = Bukkit.getPluginManager().isPluginEnabled("NameLayer");
 		isMercury = plugin.isMercuryLoaded();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
@@ -159,10 +162,15 @@ public class PrisonPearlManager implements Listener {
 			return false;
 		}
 
-		OfflinePlayer pearled = Bukkit.getOfflinePlayer(imprisonedId);
 		// create the prison pearl
-		PrisonPearl pp = pearls.newPearl(pearled, imprisoner);
-		String name = pearled.getName();
+		String name = "";
+		if (isNameLayer){
+			name = NameAPI.getCurrentName(imprisonedId);
+		} else {
+	        name = Bukkit.getOfflinePlayer(imprisonedId).getName();
+		}
+		
+		PrisonPearl pp = pearls.newPearl(name, imprisonedId, imprisoner);
 		// set off an event
 		if (!prisonPearlEvent(pp, PrisonPearlEvent.Type.NEW, imprisoner)) {
 			pearls.deletePearl(pp, "Something canceled the creation of the pearl for player " + pp.getImprisonedName() +
@@ -192,7 +200,7 @@ public class PrisonPearlManager implements Listener {
 
 
                 //check if imprisoned was imprisoned by themselves
-		if(imprisoner.getUniqueId() == pearled.getUniqueId()){
+		if(imprisoner.getUniqueId() == pp.getImprisonedId()){
 			//ok player imprisoned themselves throw the pearl on the floor
 			imprisoner.getWorld().dropItem(imprisoner.getLocation(), is);
 			Bukkit.getLogger().info("Player attempted to imprison themself. Pearl was dropped");

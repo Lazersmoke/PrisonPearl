@@ -604,6 +604,10 @@ class PrisonPearlCommands implements CommandExecutor {
         	uuid = NameAPI.getUUID(args[0]);
         else
         	uuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
+        if (uuid == null){
+        	sender.sendMessage("No player found with the name: "+args[0]);
+        	return true;
+        }
         if (pearlman.imprisonPlayer(uuid, (Player)sender)) {
             sender.sendMessage("You imprisoned " + args[0]);
             Player imprisoned = Bukkit.getPlayer(uuid);
