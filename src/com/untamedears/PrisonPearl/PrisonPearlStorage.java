@@ -354,7 +354,7 @@ public class PrisonPearlStorage implements SaveLoad {
 				if (existing_meta != null) {
 					String existing_name = existing_meta.getDisplayName();
 					List<String> lore = existing_meta.getLore();
-					if (existing_name != null &&
+					if (existing_name != null && prisoner != null &&
 							existing_name.compareTo(prisoner) == 0 && lore != null && lore.size() == 3) {
 						return true;
 					}
