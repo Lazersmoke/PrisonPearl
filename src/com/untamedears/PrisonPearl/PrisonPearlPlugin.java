@@ -127,10 +127,10 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			e1.printStackTrace();
 		}
 		
+		pearlman = new PrisonPearlManager(this, pearls, ee);
 		load(pearls, getPrisonPearlsFile());
 		damageman = new DamageLogManager(this);
 		ee= new EnderExpansion(pearls);
-		pearlman = new PrisonPearlManager(this, pearls, ee);
 		summonman = new SummonManager(this, pearls);
 		load(summonman, getSummonFile());
 		portalman = new PrisonPortaledPlayerManager(this, pearls);

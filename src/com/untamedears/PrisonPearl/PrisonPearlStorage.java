@@ -352,8 +352,8 @@ public class PrisonPearlStorage implements SaveLoad {
 			if (existing_is == null || existing_is.getType() != Material.ENDER_PEARL)
 				continue;
 			int pearlslot = inv.first(existing_is);
-			existing_is.setDurability((short) 0);
 			if (existing_is != null) {
+				existing_is.setDurability((short) 0);
 				ItemMeta existing_meta = existing_is.getItemMeta();
 				if (existing_meta != null) {
 					String existing_name = existing_meta.getDisplayName();
@@ -362,6 +362,8 @@ public class PrisonPearlStorage implements SaveLoad {
 							existing_name.compareTo(prisoner) == 0 && lore != null && lore.size() == 3) {
 						return true;
 					}
+					else if (prisoner != null && existing_name.compareTo(prisoner) != 0) // If we don't have the right pearl keep looking.
+						continue;
 				}
 			}
 			ItemMeta im = is.getItemMeta(); 
