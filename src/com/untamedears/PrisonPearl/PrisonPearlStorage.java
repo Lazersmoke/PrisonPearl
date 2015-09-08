@@ -360,10 +360,16 @@ public class PrisonPearlStorage implements SaveLoad {
 					List<String> lore = existing_meta.getLore();
 					if (existing_name != null && prisoner != null &&
 							existing_name.compareTo(prisoner) == 0 && lore != null && lore.size() == 3) {
+						// This check says all existing stuff is there so return true.
 						return true;
 					}
-					else if (prisoner != null && existing_name.compareTo(prisoner) != 0) // If we don't have the right pearl keep looking.
+					else if (existing_name != null && 
+							prisoner != null && existing_name.compareTo(prisoner) != 0) 
+						// If we don't have the right pearl keep looking.
 						continue;
+					else if (existing_name == null)
+						// This pearl can't even be right so just return.
+						return true;
 				}
 			}
 			ItemMeta im = is.getItemMeta(); 
