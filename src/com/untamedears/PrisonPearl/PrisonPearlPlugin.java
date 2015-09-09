@@ -637,7 +637,7 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			
 			int firstpearl = Integer.MAX_VALUE; // find the first regular enderpearl in their inventory
 			for (Entry<Integer, ? extends ItemStack> entry : damager.getInventory().all(Material.ENDER_PEARL).entrySet()) {
-				if (entry.getValue().getDurability() == 0)
+				if (!entry.getValue().hasItemMeta())
 					firstpearl = Math.min(entry.getKey(), firstpearl);
 			}
 			
