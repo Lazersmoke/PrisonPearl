@@ -51,7 +51,7 @@ public class PrisonPearlMysqlStorage {
 				+ "z int not null,"
 				+ "uq int not null,"
 				+ "motd varchar(255) not null," 
-				+ "primary key ids_id(ids));");
+				+ "primary key ids_id(uuid));");
 		db.execute("create table if not exists PrisonPearlPortaled("
 				+ "uuid varchar(36) not null,"
 				+ "primary key uuid_key(uuid));");
