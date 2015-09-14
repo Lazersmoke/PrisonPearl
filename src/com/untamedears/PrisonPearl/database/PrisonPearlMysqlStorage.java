@@ -39,6 +39,7 @@ public class PrisonPearlMysqlStorage {
 				Bukkit.getLogger());
 		if (db.connect()) {
 			initializeTables();
+			initializeStatements();
 		}
 	}
 
@@ -336,8 +337,10 @@ public class PrisonPearlMysqlStorage {
 	public long getLastRestart() {
 		long lastRestart = 0;
 		try {
-			ResultSet result = getLastRestart.executeQuery();
-			lastRestart = result.getLong("lastRestart");
+			ResultSet set = getLastRestart.executeQuery();
+			if (!set.next())
+				return lastRestart;
+			lastRestart = set.getLong("lastRestart");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

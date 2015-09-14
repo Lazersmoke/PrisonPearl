@@ -46,7 +46,7 @@ public class PrisonPearlStorage implements SaveLoad {
 	private static PrisonPearlPlugin plugin;
 	private final Map<UUID, PrisonPearl> pearls_byimprisoned;
 	
-	public static List<UUID> transferedPlayers = new ArrayList<UUID>();
+	public static List<UUID> transferedPlayers;
 	
 	private long lastFeed = 0;
 	
@@ -59,7 +59,7 @@ public class PrisonPearlStorage implements SaveLoad {
 		isNameLayer = Bukkit.getPluginManager().isPluginEnabled("NameLayer");
 		isMysql = plugin.getPPConfig().getMysqlEnabled();
 		PrisonPearlMysqlStorage = plugin.getMysqlStorage();
-				
+		transferedPlayers = new ArrayList<UUID>();
 		this.plugin = plugin;
 		pearls_byimprisoned = new HashMap<UUID, PrisonPearl>();
 	}
