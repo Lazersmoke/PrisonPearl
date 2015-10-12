@@ -20,6 +20,7 @@ public class CombatTagManager {
 	private NpcPlayerHelper combatTagPlusApi;
 	private boolean combatTagEnabled = false;
 	private boolean combatTagPlusEnabled = false;
+	private Server server;
 
 	public CombatTagManager(Server server, Logger l) {
 		if(server.getPluginManager().getPlugin("CombatTag") != null) {
@@ -31,6 +32,7 @@ public class CombatTagManager {
 			combatTagPlusApi = ((CombatTagPlus) server.getPluginManager().getPlugin("CombatTagPlus")).getNpcPlayerHelper();
 			combatTagPlusEnabled = true;
 		}
+		this.server = server;
 	}
 	
 	public boolean isCombatTagNPC(Entity player) {
@@ -42,11 +44,12 @@ public class CombatTagManager {
 	}
 	
 	public boolean isCombatTagged(Player player) {
-        return combatTagEnabled && combatTagApi != null && combatTagApi.isInCombat(player.getName());
+        return (combatTagEnabled && combatTagApi != null && combatTagApi.isInCombat(player.getName())) || 
+        		(combatTagPlusEnabled && combatTagPlusApi != null && CombatTagPlus.getTagManager().isTagged(player.getUniqueId()));
     }
 	
 	public boolean isCombatTagged(String playerName) {
-		return combatTagEnabled && combatTagApi != null && combatTagApi.isInCombat(playerName);
+		return isCombatTagged(server.getPlayer(playerName));
 	}
 	
 	public NpcIdentity getCombatTagPlusNPCIdentity(Player player){
