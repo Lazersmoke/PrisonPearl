@@ -249,7 +249,7 @@ permissions:
    prisonpearl.wb:
       default: op
       
-   prisonpearl.admin
+   prisonpearl.admin:
       default: op
 
    prisonpearl.*:
