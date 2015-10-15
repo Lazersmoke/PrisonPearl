@@ -120,8 +120,10 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		pearls = new PrisonPearlStorage(this);
 		 // updates files to uuid
 		try {
-			updateToUUID();
-			updateToRemoveDur();
+			if (getMysqlStorage() != null) {
+				updateToUUID();
+				updateToRemoveDur();
+			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -447,6 +449,10 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 	
 	private static void save(SaveLoad obj, File file) {
 		try {
+			if (globalInstance.getMysqlStorage() == null) {
+				obj.save(null);
+				return;
+			}
 			File newfile = new File(file.getAbsolutePath() + ".new");
 			File bakfile = new File(file.getAbsolutePath() + ".bak");
 			
