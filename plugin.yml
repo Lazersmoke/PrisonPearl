@@ -2,99 +2,118 @@ name: ${project.name}
 main: com.untamedears.PrisonPearl.PrisonPearlPlugin
 version: ${project.version}
 softdepend: [NameLayer, CombatTag, WorldBorder, CombatTagPlus]
+description: PrisonPearl makes it so players can imprison each other (called 'pearling') in The End. Kill someone with an ender pearl in your hotbar and they'll be stuck in The End and tied to the pearl. Destroying the pearl releases them.
 commands:
    pplocate:
       description: Locates your prison pearl
       usage: /<command>
       aliases: ppl
+      permission: prisonpearl.normal.pplocate
 
    ppfeed:
       description: Feeds prison pearls
       usage: /<command>
+      permission: prisonpearl.admin
 
    pplocateany:
       description: Locates any prison pearl in the world
       usage: /<command> player
+      permission: prisonpearl.pplocateany
 
    ppfree:
       description: Frees a prison pearl
       usage: /<command> [player]
       aliases: ppf
+      permission: prisonpearl.normal.ppfree
 
    ppfreeany:
       description: Frees any prison pearl in the world
       usage: /<command> player
+      permission: prisonpearl.ppfreeany
+      
 
    ppsummon:
       description: Summons a player from their prison pearl, requiring them to stay within range of their pearl
       usage: /ppsummon [player] [range]
       aliases: pps
+      permission: prisonpearl.normal.ppsummon
 
    ppreturn:
       description: Returns a summoned player back to their prison pearl
       usage: /ppbanish [player]
       aliases: ppr
+      permission: prisonpearl.normal.ppreturn
 
    ppkill:
       description: Instantly kills a summoned player, sending them back to their prison pearl
       usage: /ppkill [player]
       aliases: ppk
+      permission: prisonpearl.normal.ppkill
 
    ppsave:
       description: Saves all prisonpearl related data to disk
       usage: /ppsave
+      permission: prisonpearl.ppsave
 
    ppimprisonany:
       description: Imprisons any player in the world
       usage: /ppimprisonany player
+      permission: prisonpearl.ppimprisonany
 
    ppbroadcast:
       description: Broadcast your pplocate commands to another player
       usage: /ppbroadcast player
       alias: ppb
+      permission: prisonpearl.normal.ppbroadcast
 
    ppconfirm:
       description: Confirm reception of pplocate commands from a player
       usage: /ppconfirm [player]
+      permission: prisonpearl.normal.ppconfirm
 
    ppsilence:
       description: Silence reception of pplocate commands from player
       usage: /ppsilence player
-
-   ppinfo:
-      description: Get information about player in a pearl
-      usage: /ppinfo [player]
-      alias: ppi
+      permission: prisonpearl.normal.ppsilence
 
    pploadalts:
       description: reload alt lists from file
       usage: /pploadalts
+      permission: prisonpearl.pploadalts
 
    ppcheckall:
       description: checkban all accounts
       usage: /ppcheckall
+      permission: prisonpearl.ppcheckall
 
    ppcheck:
       description: checkban the player
       usage: /ppcheck [player]
+      permission: prisonpearl.ppcheck
 
    ppsetdist:
       description: Sets distance prisoner can move.
+      permission: prisonpearl.normal.ppsetdist
 
    ppsetdamage:
       description: Sets damage prisoner receives.
+      permission: prisonpearl.normal.ppsetdamage
 
    pptogglespeech:
       description: Toggles whether prisoner can talk in public chat.
+      permission: prisonpearl.normal.pptogglespeech
 
    pptoggledamage:
       description: Toggles whether prisoner can damage players and mobs.
+      permission: prisonpearl.normal.pptoggledamage
 
    pptoggleblocks:
       description: Toggles whether prisoner can break blocks.
+      permission: prisonpearl.normal.pptoggleblocks
 
    ppsetmotd:
       description: Sets prisoner's MOTD.
+      permission: prisonpearl.normal.ppsetmotd
       
    ppgetalts:
       description: Gets a list of the players associated accounts.
@@ -104,6 +123,7 @@ commands:
    ppsetalts:
       description: Allows people to add players to the excluded_alts.txt.
       usage: /ppsetalts [playername] [confirmedalt1] [confirmedalt2] etc....
+      permission: prisonpearl.setalts
 
    ppban:
       description: Bans a player's alt list.
@@ -227,6 +247,9 @@ permissions:
       default: op
    
    prisonpearl.wb:
+      default: op
+      
+   prisonpearl.admin:
       default: op
 
    prisonpearl.*:
