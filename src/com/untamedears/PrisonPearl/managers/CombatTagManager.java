@@ -3,6 +3,7 @@ package com.untamedears.PrisonPearl.managers;
 import java.util.logging.Logger;
 
 import net.minelink.ctplus.CombatTagPlus;
+import net.minelink.ctplus.TagManager;
 import net.minelink.ctplus.Npc;
 import net.minelink.ctplus.compat.api.NpcIdentity;
 import net.minelink.ctplus.compat.api.NpcPlayerHelper;
@@ -20,6 +21,7 @@ public class CombatTagManager {
 	private NpcPlayerHelper combatTagPlusApi;
 	private boolean combatTagEnabled = false;
 	private boolean combatTagPlusEnabled = false;
+	private TagManager combatTagPlusTagManager;
 	private Server server;
 
 	public CombatTagManager(Server server, Logger l) {
@@ -30,6 +32,7 @@ public class CombatTagManager {
 		
 		if (server.getPluginManager().getPlugin("CombatTagPlus") != null){
 			combatTagPlusApi = ((CombatTagPlus) server.getPluginManager().getPlugin("CombatTagPlus")).getNpcPlayerHelper();
+			combatTagPlusTagManager = ((CombatTagPlus) server.getPluginManager().getPlugin("CombatTagPlus")).getTagManager();
 			combatTagPlusEnabled = true;
 		}
 		this.server = server;
@@ -45,7 +48,7 @@ public class CombatTagManager {
 	
 	public boolean isCombatTagged(Player player) {
         return (combatTagEnabled && combatTagApi != null && combatTagApi.isInCombat(player.getName())) || 
-        		(combatTagPlusEnabled && combatTagPlusApi != null && CombatTagPlus.getTagManager().isTagged(player.getUniqueId()));
+        		(combatTagPlusEnabled && combatTagPlusApi != null && combatTagPlusTagManager.isTagged(player.getUniqueId()));
     }
 	
 	public boolean isCombatTagged(String playerName) {
