@@ -24,6 +24,10 @@ public class CombatTagManager {
 	private TagManager combatTagPlusTagManager;
 	private Server server;
 
+	public boolean isEnabled() {
+		return combatTagEnabled || combatTagPlusEnabled;
+	}
+
 	public CombatTagManager(Server server, Logger l) {
 		if(server.getPluginManager().getPlugin("CombatTag") != null) {
 			combatTagApi = new CombatTagApi((CombatTag)server.getPluginManager().getPlugin("CombatTag"));
