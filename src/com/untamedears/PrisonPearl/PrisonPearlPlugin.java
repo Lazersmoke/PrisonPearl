@@ -120,7 +120,7 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		pearls = new PrisonPearlStorage(this);
 		 // updates files to uuid
 		try {
-			if (getMysqlStorage() != null) {
+			if (getMysqlStorage() == null) {
 				updateToUUID();
 				updateToRemoveDur();
 			}
