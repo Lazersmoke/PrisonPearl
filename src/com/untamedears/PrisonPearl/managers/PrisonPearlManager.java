@@ -704,6 +704,11 @@ public class PrisonPearlManager implements Listener {
 		World newWorld = to.getWorld();
 		if (!denyWorlds.contains(newWorld.getName()))
 			return;
+      
+                World oldWorld = previous.getWorld();
+                //not changing worlds, no reason to free pearls
+                if(newWorld.getName().equals(oldWorld.getName()))
+                        return;
 		
 		Inventory inv = event.getPlayer().getInventory();
 		boolean message = false;
