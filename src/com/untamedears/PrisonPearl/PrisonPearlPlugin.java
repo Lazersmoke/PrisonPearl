@@ -120,7 +120,7 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		pearls = new PrisonPearlStorage(this);
 		 // updates files to uuid
 		try {
-			if (getMysqlStorage() != null) {
+			if (getMysqlStorage() == null) {
 				updateToUUID();
 				updateToRemoveDur();
 			}
@@ -624,6 +624,9 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 			uuid = iden.getId();
 			playerName = iden.getName();
 			log.info("NPC Player: " + playerName + ", ID: " + uuid);
+		} else if (combatTagManager.isEnabled() && !combatTagManager.isCombatTagged(player)) {
+			log.info("Player: " + playerName + " is out of combatTag, immune from pearling.");
+			return;
 		}
 		
 		PrisonPearl pp = pearls.getByImprisoned(uuid); // find out if the player is imprisoned
