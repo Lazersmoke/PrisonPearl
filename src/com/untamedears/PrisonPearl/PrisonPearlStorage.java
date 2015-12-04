@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.BrewingStand;
 import org.bukkit.block.Chest;
@@ -30,6 +31,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -412,8 +414,8 @@ public class PrisonPearlStorage implements SaveLoad {
 		int coalfed = 0;
 		int freedpearls = 0;
 		for (PrisonPearl pp : map.values()) {
-
 			final UUID prisonerId = pp.getImprisonedId();
+			fixAllPearlMissing(prisonerId);
 			//final String prisoner = Bukkit.getPlayer(prisonerId).getName();
 			Inventory inv[] = new Inventory[2];
 			int retval = HolderStateToInventory(pp, inv);
@@ -529,7 +531,7 @@ public class PrisonPearlStorage implements SaveLoad {
     }
     
     public PrisonPearl getPearlbyItemStack(ItemStack stack) {
-    	if (!stack.hasItemMeta() || stack.getType() != Material.ENDER_PEARL)
+    	if (stack == null || !stack.hasItemMeta() || stack.getType() != Material.ENDER_PEARL)
     		return null;
     	if (!stack.getItemMeta().hasLore())
     		return null;
@@ -537,6 +539,106 @@ public class PrisonPearlStorage implements SaveLoad {
     	if (lore.size() != 3)
     		return null;
     	UUID uuid = UUID.fromString(lore.get(1).split(" ")[1]);
-    	return pearls_byimprisoned.get(uuid);
+    	PrisonPearl pearl = pearls_byimprisoned.get(uuid);
+    	if (pearl == null)
+    		return null;
+    	int id = Integer.parseInt(lore.get(2).split(" ")[1]);
+    	System.out.println(pearl.getImprisonedId().toString() + " " + id);
+    	if (pearl.getUniqueIdentifier() != id)
+    		return null;
+    	return pearl;
+    }
+    
+    private void fixAllPearlMissing(UUID uuid) {
+    	if (!plugin.getPPConfig().getShouldFixMissingPearls())
+    		return;
+    	PrisonPearl pp = pearls_byimprisoned.get(uuid);
+    	Location loc = pp.getLocation();
+    	Block b = pp.getLocation().getBlock();
+    	Inventory[] inv = new Inventory[2];
+    	BlockState inherentViolence = pp.getHolderBlockState();
+    	// Grabs the inventories.
+    	switch(b.getType()) {
+		case FURNACE:
+			inv[0] = ((Furnace)inherentViolence).getInventory();
+			break;
+		case DISPENSER:
+			inv[0] = ((Dispenser)inherentViolence).getInventory();
+			break;
+		case BREWING_STAND:
+			inv[0] = ((BrewingStand)inherentViolence).getInventory();
+			break;
+		case CHEST:
+		case TRAPPED_CHEST:
+			Chest c = ((Chest)inherentViolence);
+			DoubleChestInventory dblInv = null;
+			try {
+				dblInv = (DoubleChestInventory)c.getInventory();
+				inv[0] = dblInv.getLeftSide();
+				inv[1] = dblInv.getRightSide();
+			} catch(Exception e){
+				inv[0] = c.getInventory();
+			}
+			break;
+		default:
+			inv[0] = null;
+			inv[1] = null;
+		}
+		ItemStack stack = null;
+		// Scans the inventories looking for the prisonpearl.
+    	for (Inventory i: inv) {
+    		if (i == null)
+    			continue;
+    		for (int x = 0; x < i.getSize(); x++) {
+    			ItemStack s = i.getItem(x);
+    			if (s == null || s.getType() != Material.ENDER_PEARL)
+    				continue;
+    			PrisonPearl tmp = getPearlbyItemStack(s);
+    			if (tmp == null)
+    				continue;
+    			if (tmp.getImprisonedId().equals(uuid)) {
+    				stack = s;
+    				break;
+    			}
+    		}
+    		if (stack != null)
+    			break;
+    	}
+    	if (stack == null)
+    		for (Inventory i: inv) {
+            	if (stack != null)
+        			break;
+        		for (int x = 0; x < i.getSize(); x++) {
+        			ItemStack current = i.getItem(x);
+        			if (getPearlbyItemStack(current) == null) {
+        				deletePearl(pp, "Regenerating pearl cause it was lost. UUID is: " + pp.getImprisonedId().toString());
+        				String name = "";
+        				if (isNameLayer){
+        					name = NameAPI.getCurrentName(uuid);
+        				} else {
+        			        name = Bukkit.getOfflinePlayer(uuid).getName();
+        				}
+        				pp = new PrisonPearl(name, uuid, loc, new Random().nextInt(1000));
+        				addPearl(pp);
+        				ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
+        				ItemMeta im = is.getItemMeta();
+        				// Rename pearl to that of imprisoned player
+        				im.setDisplayName(name);
+        				List<String> lore = new ArrayList<String>();
+        				// Gives pearl lore that says more info when hovered over
+        				lore.add(name + " is held within this pearl");
+        				lore.add("UUID: "+pp.getImprisonedId());
+        				lore.add("Unique: " + pp.getUniqueIdentifier());
+        				// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
+        				im.addEnchant(Enchantment.DURABILITY, 1, true);
+        				im.setLore(lore);
+        				is.setItemMeta(im);
+        				i.clear(x);
+        				i.setItem(x, is);
+        				stack = is;
+        				break;
+        			}
+        		}
+    		}
     }
 }

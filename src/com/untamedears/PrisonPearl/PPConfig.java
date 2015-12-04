@@ -18,6 +18,7 @@ public class PPConfig {
 	private String mysqlUsername;
 	private String mysqlPassword;
 	private int mysqlPort;
+	private boolean fixMissingPearls;
 	
 	public PPConfig(ConfigurationSection config) {
 		this.upkeep_resource = config.getInt("upkeep.resource");
@@ -43,6 +44,7 @@ public class PPConfig {
 		this.mysqlUsername = config.getString("mysql.username", "bukkit");
 		this.mysqlPassword = config.getString("mysql.password", "");
 		this.mysqlPort = config.getInt("mysql.port", 3306);
+		this.fixMissingPearls = config.getBoolean("fixMissingPearls", false);
 	}
 
 	public ItemStack getUpkeepResource() {
@@ -56,6 +58,7 @@ public class PPConfig {
 	public boolean getPpsummonClearInventory() {
 		return this.ppsummon_clear_inventory;
 	}
+	
 
 	public boolean getPpsummonLeavePearls() {
 		return this.ppsummon_leave_pearls;
@@ -95,5 +98,9 @@ public class PPConfig {
 	
 	public String getMysqlDbname(){
 		return mysqlDbname;
+	}
+	
+	public boolean getShouldFixMissingPearls() {
+		return fixMissingPearls;
 	}
 }
