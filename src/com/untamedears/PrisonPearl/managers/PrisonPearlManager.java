@@ -238,7 +238,7 @@ public class PrisonPearlManager implements Listener {
 	
 	public boolean freePearlFromMercury(PrisonPearl pp, String reason, String server) {
 		pearls.deletePearlMercuryCase(pp);
-		if (server != null) {
+		if (server != null && pp.getImprisonedPlayer() != null) {
 			BetterShardsAPI.connectPlayer(pp.getImprisonedPlayer(), server, PlayerChangeServerReason.PLUGIN);
 			return true;
 		}
@@ -823,7 +823,13 @@ public class PrisonPearlManager implements Listener {
 			return false;
 		String uuid = lore.get(1).split(" ")[1];
 		int unique = Integer.parseInt(lore.get(2).split(" ")[1]);
-		return uuid.equals(pp.getImprisonedId().toString()) && unique == pp.getUniqueIdentifier();
+		boolean isValid = uuid.equals(pp.getImprisonedId().toString()) && unique == pp.getUniqueIdentifier();
+		if (!isValid) {
+			for (Enchantment en: stack.getItemMeta().getEnchants().keySet())
+				stack.removeEnchantment(en);
+			stack.getItemMeta().getLore().clear();
+		}
+		return isValid;
 	}
 	
 	// Removes after getting location
