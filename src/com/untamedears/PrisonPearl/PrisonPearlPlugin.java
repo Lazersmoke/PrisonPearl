@@ -547,6 +547,16 @@ public class PrisonPearlPlugin extends JavaPlugin implements Listener {
 		checkBan(player.getUniqueId());
 		UUID uuid = player.getUniqueId();
 		
+		// Incase a player comes from another server and has a pearl.
+		for (ItemStack stack: player.getInventory().getContents()) {
+			if (stack == null)
+				continue;
+			PrisonPearl pp = pearls.getByItemStack(stack);
+			if (pp == null)
+				continue;
+			pp.setHolder(player);
+		}
+		
 		Location loc = pearlman.getRecentlyFreedLocation(uuid);
 		if (loc != null) {
 			player.teleport(loc);
