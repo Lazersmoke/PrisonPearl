@@ -21,11 +21,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.untamedears.PrisonPearl.PrisonPearl;
-import com.untamedears.PrisonPearl.PrisonPearlPlugin;
-import com.untamedears.PrisonPearl.PrisonPearl.Holder;
-import com.untamedears.PrisonPearl.PrisonPearl.HolderVerReason;
-
+import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class PrisonPearl {
@@ -74,6 +70,7 @@ public class PrisonPearl {
 	private boolean pearlOnCursor = false;
 	private long lastMoved = 0;
 	private final int unique;
+	private PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 
 	public PrisonPearl(String imprisonedName, UUID imprisonedId,
 			Player holderplayer, int unique) {
@@ -199,7 +196,12 @@ public class PrisonPearl {
 				return "an unknown block";
 			}
 		} else if (holder.supposedPearlLocation != null) {
-			return "another player on another server";
+			FakeLocation fake = (FakeLocation) holder.supposedPearlLocation;
+			String player = fake.getPlayer();
+			String server = fake.getServerName();
+			if (player != null)
+				return player + " on server " + server;
+			return "on server " + server;
 		} else {
 			// PrisonPearlPlugin.info("PrisonPearl " + imprisonedId.toString() +
 			// " has no player, item, nor location");
@@ -422,6 +424,8 @@ public class PrisonPearl {
     }
 
     public void setMotd(String motd) {
+    	if (motd != null && motd.equals(""))
+    		motd = null;
         this.motd = motd;
     }
 

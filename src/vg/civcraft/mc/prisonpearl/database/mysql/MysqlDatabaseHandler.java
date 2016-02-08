@@ -8,6 +8,7 @@ import vg.civcraft.mc.civmodcore.Config;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigs;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPortaledStorage;
@@ -25,7 +26,7 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 	private PrisonPearlMysqlStorage ppStorage;
 	private PrisonPortaledMysqlStorage portaledStorage;
 	private SummonMysqlStorage summonStorage;
-	private WorldBorderMysqlStorage worlderBorderStorage;
+	private WorldBorderMysqlStorage worldBorderStorage;
 	
 	public MysqlDatabaseHandler() {
 		plugin = PrisonPearlPlugin.getInstance();
@@ -34,19 +35,13 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 		initializeStorageManagers();
 	}
 	
-	@CivConfigs({
-		@CivConfig(name = "database.mysql.username", def = "bukkit", type = CivConfigType.String),
-		@CivConfig(name = "database.mysql.password", def = "", type = CivConfigType.String),
-		@CivConfig(name = "database.mysql.dbname", def = "bukkit", type = CivConfigType.String),
-		@CivConfig(name = "database.mysql.host", def = "localhost", type = CivConfigType.String),
-		@CivConfig(name = "database.mysql.port", def = "3306", type = CivConfigType.Int)
-	})
+	
 	private void initializeDB() {
-		String username = config.get("database.mysql.username").getString();
-		String password = config.get("database.mysql.password").getString();
-		String dbname = config.get("database.mysql.dbname").getString();
-		String host = config.get("database.mysql.host").getString();
-		int port = config.get("database.mysql.port").getInt();
+		String username = PrisonPearlConfig.getUsername();
+		String password = PrisonPearlConfig.getPassword();
+		String dbname = PrisonPearlConfig.getDBName();
+		String host = PrisonPearlConfig.getHost();
+		int port = PrisonPearlConfig.getPort();
 		db = new Database(host, port, dbname, username, password, plugin.getLogger());
 		if (!db.connect()) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to connect to mysql, shutting down.");
@@ -55,7 +50,10 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 	}
 	
 	private void initializeStorageManagers() {
-		
+		ppStorage = new PrisonPearlMysqlStorage(db, this);
+		portaledStorage = new PrisonPortaledMysqlStorage(db, this);
+		summonStorage = new SummonMysqlStorage(db, this);
+		worldBorderStorage = new WorldBorderMysqlStorage(db, this);
 	}
 
 	@Override
@@ -75,7 +73,7 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 
 	@Override
 	public IWorldBorderStorage getWorldBorderStorage() {
-		return worlderBorderStorage;
+		return worldBorderStorage;
 	}
 
 	@Override

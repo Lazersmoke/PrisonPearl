@@ -7,14 +7,20 @@ public class FakeLocation extends Location{
 	private String world;
 	private double x, y, z;
 	private String server;
+	private String player;
 	
-	public FakeLocation(String world, double x, double y, double z, String server) {
+	public FakeLocation(String world, double x, double y, double z, String server, String player) {
 		super(null, x, y, z);
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.server = server;
+		this.player = player;
+	}
+	
+	public FakeLocation(String world, double x, double y, double z, String server) {
+		this(world, x, y, z, server, null);
 	}
 	
 	public String getWorldName() {
@@ -23,6 +29,10 @@ public class FakeLocation extends Location{
 	
 	public String getServerName() {
 		return server;
+	}
+	
+	public String getPlayer() {
+		return player;
 	}
 	
 	@Override
