@@ -1,5 +1,5 @@
 package vg.civcraft.mc.prisonpearl.command.commands;
 
-public class Summon {
+public class SummonCommand {
 
 }
