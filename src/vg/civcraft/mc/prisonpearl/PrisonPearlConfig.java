@@ -68,8 +68,88 @@ public class PrisonPearlConfig {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.clearinventoryonsummon").getBool();
 	}
 	
+	@CivConfig(name = "prison.ppreturn_kill", def = "true", type = CivConfigType.Bool)
+	public static boolean getShouldPPReturnKill() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.ppreturn_kill").getBool();
+	}
+	
 	@CivConfig(name = "prison.ppsummonpearls", def = "true", type = CivConfigType.Bool)
 	public static boolean shouldPpsummonLeavePearls() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.ppsummonpearls").getBool();
+	}
+	
+	@CivConfig(name = "prison.motd", def = "You have been imprisoned!", type = CivConfigType.String_List)
+	public static List<String> getPrisonMotd() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.motd").getStringList();
+	}
+	
+	@CivConfig(name = "ignore_feed.seconds", def = "0" , type = CivConfigType.Long)
+	public static long getIgnoreFeedSecond() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("ignore_feed.seconds").getLong();
+	}
+	
+	@CivConfig(name = "ignore_feed.hours", def = "0" , type = CivConfigType.Long)
+	public static long getIngoreFeedHours() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("ignore_feed.hours").getLong();
+	}
+	
+	@CivConfig(name = "ignore_feed.days", def = "0" , type = CivConfigType.Long)
+	public static long getIngoreFeedDays() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("ignore_feed.days").getLong();
+	}
+	
+	@CivConfig(name = "ignore_feed.feed_delay", def = "72000000" , type = CivConfigType.Long)
+	public static long getIgnoreFeedDelay() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("feed_delay").getLong();
+	}
+	
+	@CivConfig(name = "upkeep.resource", def = "263", type = CivConfigType.Int)
+	public static int getResourceUpkeepMaterial() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("upkeep.resource").getInt();
+	}
+	
+	@CivConfig(name = "upkeep.quanity", def = "4" , type = CivConfigType.Int)
+	public static int getResourceUpkeepAmount() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("upkeep.quantity").getInt();
+	}
+	
+	@CivConfig(name = "autofree_worldborder", def = "true", type = CivConfigType.Bool)
+	public static boolean getShouldAutoFreeWorldBorder() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("autofree_worldborder").getBool();
+	}
+	
+	@CivConfig(name = "prison_musthotbar", def = "true", type = CivConfigType.Bool)
+	public static boolean getMustPrisonPearlHotBar() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("prison_musthotbar").getBool();
+	}
+	
+	@CivConfig(name = "prison_stealing", def = "true", type = CivConfigType.Bool)
+	public static boolean getAllowPrisonStealing() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("prison_stealing").getBool();
+	}
+	
+	@CivConfig(name = "damagelog_min", def = "3" , type = CivConfigType.Int)
+	public static int getDamageLogMin() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("damagelog_min").getInt();
+	}
+	
+	@CivConfig(name = "damagelog_ticks", def = "600" , type = CivConfigType.Int)
+	public static int getDamagelogTicks() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("damagelog_ticks").getInt();
+	}
+	
+	@CivConfig(name = "summon_damage_radius", def = "20" , type = CivConfigType.Int)
+	public static int getSummonDamageRadius() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("summon_damage_radius").getInt();
+	}
+	
+	@CivConfig(name = "summon_damage_ticks", def = "20" , type = CivConfigType.Int)
+	public static int getSummonDamageTicks() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("summon_damage_ticks").getInt();
+	}
+	
+	@CivConfig(name = "summon_damage_amt", def = "2" , type = CivConfigType.Int)
+	public static int getSummonDamageAmount() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("summon_damage_amt").getInt();
 	}
 }

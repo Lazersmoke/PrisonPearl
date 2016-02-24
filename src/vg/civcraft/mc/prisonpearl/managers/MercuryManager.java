@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
@@ -46,10 +47,10 @@ public class MercuryManager {
     			continue; // If it isn't your pearl don't worry about it.  The server that has it will send the messages.
     		
     		String playerName = null;
-    		if (pp.getHolderPlayer() == null)
+    		if (pp.getHolderPlayer() != null)
     			playerName = pp.getHolderPlayer().getDisplayName();
-    		String message = pp.getImprisonedId().toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ() + "|" +
-    				pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd();
+    		String message = "move|" + pp.getImprisonedId().toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + 
+    			loc.getBlockY() + "|" + loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName;
     		MercuryAPI.sendGlobalMessage(message, channel);
     	}
     }
@@ -58,7 +59,7 @@ public class MercuryManager {
 		if (!isMercuryEnabled)
 			return;
 		String message = "";
-		message += imprisoner.toString() + "|" + pearled.toString();
+		message += "transfer|" + imprisoner.toString() + "|" + pearled.toString();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
@@ -70,49 +71,91 @@ public class MercuryManager {
 		if (pp.getHolderPlayer() != null)
 			playerName = pp.getHolderPlayer().getDisplayName();
 		UUID uuid = pp.getImprisonedId();
-		String message = uuid.toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ() + "|" +
-				pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd();
-		
-		if (type.equals(PrisonPearlEvent.Type.FREED) && PrisonPearlPlugin.getInstance().GetConfig()
-				.get("free_tppearl").getBool())
-			message += "|" + MercuryAPI.serverName();
+		String message = "update|" + type.name() + "|" + uuid.toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + 
+		loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
 	public static void requestPPSummon(UUID uuid) {
 		if (!isMercuryEnabled)
 			return;
-		String message = "request|" + uuid.toString() + "|" + MercuryAPI.serverName();
+		String message = "summon|request|" + uuid.toString() + "|" + MercuryAPI.serverName();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
 	public static void denyPPSummon(UUID uuid, String reason) {
 		if (!isMercuryEnabled)
 			return;
-		String message = "deny|" + uuid.toString() + "|" + reason;
+		String message = "summon|deny|" + uuid.toString() + "|" + reason;
+		MercuryAPI.sendGlobalMessage(message, channel);
+	}
+	
+	public static void acceptPPSummon(UUID uuid, Location loc) {
+		if (!isMercuryEnabled)
+			return;
+		String message = String.format("summon|accept|%s|%s|%d|%d|%d", uuid.toString(), loc.getWorld().getName(), loc.getBlockX(), 
+				loc.getBlockY(), loc.getBlockZ());
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
 	public static void returnPPSummon(UUID uuid) {
 		if (!isMercuryEnabled)
 			return;
-		String message = "return|" + uuid.toString();
+		String message = "summon|return|" + uuid.toString();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
-	public static void addBroadcast() {
-		
+	public static void addBroadcast(UUID pearled, UUID receiver) {
+		if (!isMercuryEnabled)
+			return;
+		String message = "broadcast|add|" + pearled.toString() + "|" + receiver.toString();
+		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
-	public static void requestBroadcast() {
-		
+	public static void requestBroadcast(UUID pearled, UUID receiver) {
+		if (!isMercuryEnabled)
+			return;
+		String message = "broadcast|request|" + pearled.toString() + "|" + receiver.toString();
+		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
-	public static void removeBroadcast() {
-		
+	public static void removeBroadcast(UUID pearled, UUID receiver) {
+		if (!isMercuryEnabled)
+			return;
+		String message = "broadcast|remove|" + pearled.toString() + "|" + receiver.toString();
+		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	
-	public static void sendBroadcast() {
-		
+	public static void sendBroadcast(UUID pearled, List<UUID> receivers) {
+		if (!isMercuryEnabled)
+			return;
+		StringBuilder builder = new StringBuilder();
+		builder.append("broadcast|send|" + pearled.toString());
+		for (int x = 0; x < receivers.size(); x++) {
+			builder.append(receivers.get(x).toString());
+			if (x + 1 < receivers.size())
+				builder.append("|");
+		}
+		MercuryAPI.sendGlobalMessage(builder.toString(), channel);
+	}
+	
+	public static boolean isPlayerOnline(UUID uuid) {
+		if (!isMercuryEnabled)
+			for (Player p: Bukkit.getOnlinePlayers())
+				if (p.getUniqueId().equals(uuid))
+					return true;
+		else
+			return MercuryAPI.getAllAccounts().contains(uuid);
+		return false;
+	}
+	
+	public static boolean isPlayerOnline(String name) {
+		if (!isMercuryEnabled)
+			for (Player p: Bukkit.getOnlinePlayers())
+				if (p.getName().equals(name))
+					return true;
+		else
+			return MercuryAPI.getAllPlayers().contains(name);
+		return false;
 	}
 }

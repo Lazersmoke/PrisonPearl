@@ -1,7 +1,5 @@
 package vg.civcraft.mc.prisonpearl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -16,13 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
 import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
-import vg.civcraft.mc.civmodcore.annotations.CivConfig;
-import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
+import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
-import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
+import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class PrisonPearlUtil {
 
@@ -57,52 +54,77 @@ public class PrisonPearlUtil {
 				String server = MercuryAPI.serverName();
 				String toServer = manager.getImprisonServer();
 				if (!server.equals(toServer)) {
-					if (PrisonPearlConfig.shouldPpsummonClearInventory()) {
-						dropInventory(p, p.getLocation(), PrisonPearlConfig.shouldPpsummonLeavePearls());
-					}
 					try {
-						Location loc = summon.
-						String info = String.format("%s %s %s %d %d %d", p.getUniqueId().toString(), )
-						BetterShardsAPI.teleportPlayer(info);
-						BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
+						FakeLocation loc = null;
+						if (summon.isSummoned(p)) {
+							Summon s = summon.getSummon(p);
+							if (s.isToBeReturned()) {
+								if (PrisonPearlConfig.getShouldPPReturnKill())
+									p.setHealth(0);
+								loc = (FakeLocation) s.getReturnLocation();
+								TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(),
+										loc.getBlockZ());
+								BetterShardsAPI.teleportPlayer(info.getServer(), p.getUniqueId(), info);
+								return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
+							}
+							else if (s.isJustCreated()) {
+								if (PrisonPearlConfig.shouldPpsummonClearInventory()) {
+									dropInventory(p, p.getLocation(), PrisonPearlConfig.shouldPpsummonLeavePearls());
+								}
+								loc = (FakeLocation) s.getPearlLocation();
+								TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(),
+										loc.getBlockZ());
+								BetterShardsAPI.teleportPlayer(info.getServer(), p.getUniqueId(), info);
+								return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
+							}
+						}
+						
+						// If the player is not summoned and on wrong world.
+						// We want the playerjoinevent on the other server to correctly spawn the player once received.
+						return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 					} catch (PlayerStillDeadException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				else {
-					Location newLoc = manager.getPrisonSpawnLocation();
-					p.teleport(newLoc);
+				else { // For if pearl is on the same server.
+					if (summon.isSummoned(p)) {
+						Summon s = summon.getSummon(p);
+						if (s.isToBeReturned()) {
+							if (PrisonPearlConfig.getShouldPPReturnKill())
+								p.setHealth(0);
+							Location newLoc = manager.getPrisonSpawnLocation();
+							p.teleport(newLoc);
+						}
+						else if (s.isJustCreated()) {
+							if (PrisonPearlConfig.shouldPpsummonClearInventory()) {
+								dropInventory(p, p.getLocation(), PrisonPearlConfig.shouldPpsummonLeavePearls());
+							}
+							p.teleport(s.getPearlLocation());
+						}
+					}
+					else if (!p.getWorld().equals(manager.getPrisonSpawnLocation()))
+						p.teleport(manager.getPrisonSpawnLocation());
+					return true;
 				}
 			}
 			else if (pp != null && freeToPearl) {
-				p.teleport(pp.getLocation());
+				p.teleport(freeToPearl ? pp.getLocation() : new Location(null, 0, 0, 0));
+				return true;
 			}
+			return false;
 		}
 		// This part will deal for when bettershards and mercury are not enabled.
 		else if (pearls.isImprisoned(uuid)) {
 			Location newLoc = manager.getPrisonSpawnLocation();
 			p.teleport(newLoc);
+			return true;
 		}
 		else if (pp != null && freeToPearl) {
 			p.teleport(pp.getLocation());
+			return true;
 		}
-	}
-	
-	public static void addCheckToReturnSummon(UUID uuid, Location loc) {
-		checkToReturnSummon.put(uuid, loc);
-	}
-	
-	public static Location getCheckToReturnSummon(UUID uuid) {
-		return checkToReturnSummon.remove(uuid);
-	}
-	
-	public static void addCheckToSummon(UUID uuid, Location loc) {
-		checkToSummon.put(uuid,  loc);
-	}
-	
-	public static Location getCheckToSummon(UUID uuid) {
-		return checkToSummon.remove(uuid);
+		return false;
 	}
 	
 	 /**

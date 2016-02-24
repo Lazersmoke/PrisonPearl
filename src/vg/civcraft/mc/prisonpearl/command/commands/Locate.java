@@ -10,15 +10,22 @@ import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 
 public class Locate extends PlayerCommand{
+
+	private PrisonPearlManager manager;
+	private BroadcastManager broad;
+	
 	public Locate(String name) {
 		super(name);
 		setIdentifier("pplocate");
 		setDescription("Locates your pearl");
 		setUsage("/ppl");
 		setArguments(0, 0);
+		manager = PrisonPearlPlugin.getPrisonPearlManager();
+		broad = PrisonPearlPlugin.getBroadcastManager();
 	}
 
 	public boolean execute(CommandSender sender, String[] args) {
@@ -28,13 +35,13 @@ public class Locate extends PlayerCommand{
 			return true;
 		}
 		Player p = (Player) sender;
-		PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 		if (!manager.isImprisoned(p)) {
 			p.sendMessage(ChatColor.RED + "You are not imprisoned");
 			return true;
 		}
 		PrisonPearl pearl = manager.getByImprisoned(p);
-		p.sendMessage(ChatColor.YELLOW + "Your pearl is "+pearl.describeLocation());
+		broad.broadcast(pearl.getImprisonedId());
+		p.sendMessage(ChatColor.YELLOW + "Your pearl is " + pearl.describeLocation());
 		return true;
 	}
 

@@ -16,13 +16,17 @@ public class Summon {
 	private boolean canSpeak = true;
 	private boolean canDamage = true;
 	private boolean canBreak = true;
-	private int distance = 25; // Nice little default.
-	private int amountDamage = 2; // Amount to damage the player per cycle.
+	private int distance; // Nice little default.
+	private int amountDamage; // Amount to damage the player per cycle.
+	private boolean toBeReturned = false; // This is mainly so PlayerRespawn method knows if it is trying to respawn the player.
+	private boolean justCreated = false; // This is mainly so PlayerRespawn method knows if it is trying to be sent to summoned player.
 	
 	public Summon(UUID uuid, Location returnLoc, PrisonPearl pp) {
 		this.uuid = uuid;
 		this.returnLoc = returnLoc;
 		this.pp = pp;
+		distance = PrisonPearlConfig.getSummonDamageRadius();
+		amountDamage = PrisonPearlConfig.getSummonDamageAmount();
 	}
 	
 	public Location getReturnLocation() {
@@ -95,5 +99,21 @@ public class Summon {
 	
 	public int getAmountDamage() {
 		return amountDamage;
+	}
+	
+	public void setToBeReturned(boolean toBeReturned) {
+		this.toBeReturned = toBeReturned;
+	}
+	
+	public boolean isToBeReturned() {
+		return toBeReturned;
+	}
+	
+	public void setJustCreated(boolean justCreated) {
+		this.justCreated = justCreated;
+	}
+	
+	public boolean isJustCreated() {
+		return justCreated;
 	}
 }

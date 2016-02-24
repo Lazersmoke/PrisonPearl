@@ -1,14 +1,19 @@
 package vg.civcraft.mc.prisonpearl.database.mysql;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import com.google.common.collect.Maps;
 
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
+import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.database.interfaces.ISummonStorage;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
@@ -23,7 +28,6 @@ public class SummonMysqlStorage implements ISummonStorage{
 		this.handle = handle;
 		createTables();
 		initializeStatements();
-		load(); // Load summons
 	}
 	
 	private void createTables() {
@@ -55,10 +59,6 @@ public class SummonMysqlStorage implements ISummonStorage{
 				+ "where uuid = ?;";
 		getAllSummonedPlayer = "select * from PrisonPearlSummon;";
 		getSummon = "select * from PrisonPearlSummon where uuid = ?;";
-	}
-	
-	private void load() {
-		
 	}
 	
 	private Map<UUID, Summon> summons = Maps.newHashMap();
@@ -122,22 +122,144 @@ public class SummonMysqlStorage implements ISummonStorage{
 	}
 
 	@Override
-	public void getSummon(UUID uuid) {
+	public Summon getSummon(UUID uuid) {
 		Summon summon = summons.get(uuid);
 		if (summon == null) {
+			handle.refreshAndReconnect();
 			PreparedStatement getSummon = db.prepareStatement(this.getSummon);
+			try {
+				getSummon.setString(1, uuid.toString());
+				ResultSet set = getSummon.executeQuery();
+				if (!set.next())
+					return null;
+				UUID worldUUID = UUID.fromString(set.getString("world"));
+				World w = Bukkit.getWorld(worldUUID);
+				Location loc = null;
+				int x = set.getInt("x");
+				int y = set.getInt("y");
+				int z = set.getInt("z");
+				if (w == null)
+					loc = new FakeLocation(worldUUID.toString(), x, y, z, PrisonPearlConfig.getImprisonServerName());
+				else 
+					loc = new Location(w, x, y, z);
+				int dist = set.getInt("dist");
+				int damage = set.getInt("damage");
+				boolean canSpeak = set.getBoolean("canSpeak");
+				boolean canDamage = set.getBoolean("canDamage");
+				boolean canBreak = set.getBoolean("canBreak");
+				summon = new Summon(uuid, loc, PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(uuid));
+				summon.setMaxDistance(dist);
+				summon.setAmountDamage(damage);
+				summon.setCanSpeak(canSpeak);
+				summon.setCanDamage(canDamage);
+				summon.setCanBreak(canBreak);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				try {
+					getSummon.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
+		return summon;
 	}
 
 	@Override
 	public boolean isSummoned(UUID uuid) {
-		// TODO Auto-generated method stub
-		return false;
+		return getSummon(uuid) != null;
 	}
 
 	@Override
 	public void updateSummon(Summon summon) {
-		// TODO Auto-generated method stub
-		
+		handle.refreshAndReconnect();
+		PreparedStatement updateSummonedPlayer = db.prepareStatement(this.updateSummonedPlayer);
+		String world = "";
+		Location loc = summon.getReturnLocation();
+		if (loc instanceof FakeLocation) 
+			world = ((FakeLocation) loc).getWorldName();
+		else
+			world = loc.getWorld().getUID().toString();
+		try {
+			updateSummonedPlayer.setString(1, world);
+			updateSummonedPlayer.setInt(2, loc.getBlockX());
+			updateSummonedPlayer.setInt(3, loc.getBlockY());
+			updateSummonedPlayer.setInt(4, loc.getBlockZ());
+			updateSummonedPlayer.setInt(5, summon.getMaxDistance());
+			updateSummonedPlayer.setInt(6, summon.getAmountDamage());
+			updateSummonedPlayer.setBoolean(7, summon.getCanSpeak());
+			updateSummonedPlayer.setBoolean(8, summon.getCanDamage());
+			updateSummonedPlayer.setBoolean(9, summon.getCanBreak());
+			updateSummonedPlayer.setString(10, summon.getUUID().toString());
+			updateSummonedPlayer.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				updateSummonedPlayer.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void save() {
+		// Don't need to do anything mysql saves.
+	}
+
+	@Override
+	public void load() {
+		handle.refreshAndReconnect();
+		PreparedStatement getAllSummonedPlayer = db.prepareStatement(this.getAllSummonedPlayer);
+		try {
+			ResultSet set = getAllSummonedPlayer.executeQuery();
+			while(set.next()) {
+				Summon summon;
+				UUID worldUUID = UUID.fromString(set.getString("world"));
+				World w = Bukkit.getWorld(worldUUID);
+				Location loc = null;
+				UUID uuid = UUID.fromString(set.getString("uuid"));
+				int x = set.getInt("x");
+				int y = set.getInt("y");
+				int z = set.getInt("z");
+				if (w == null)
+					loc = new FakeLocation(worldUUID.toString(), x, y, z, PrisonPearlConfig.getImprisonServerName());
+				else 
+					loc = new Location(w, x, y, z);
+				int dist = set.getInt("dist");
+				int damage = set.getInt("damage");
+				boolean canSpeak = set.getBoolean("canSpeak");
+				boolean canDamage = set.getBoolean("canDamage");
+				boolean canBreak = set.getBoolean("canBreak");
+				summon = new Summon(uuid, loc, PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(uuid));
+				summon.setMaxDistance(dist);
+				summon.setAmountDamage(damage);
+				summon.setCanSpeak(canSpeak);
+				summon.setCanDamage(canDamage);
+				summon.setCanBreak(canBreak);
+				summons.put(uuid, summon);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				getAllSummonedPlayer.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public Map<UUID, Summon> getAllSummons() {
+		return summons;
 	}
 }

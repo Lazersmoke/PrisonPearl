@@ -20,7 +20,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachment;
 
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
+import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.BedLocation;
+import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
+import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigs;
@@ -178,8 +181,8 @@ public class PrisonPearlManager {
 					if (BetterShardsAPI.hasBed(imprisonedId)) {
 						String worldName = getImprisonWorldName();
 						String server = getImprisonServer();
-						String loc = worldName + " 0 90 0";
-						BedLocation bed = new BedLocation(imprisonedId, worldName, server);
+						TeleportInfo info = new TeleportInfo(worldName, server, 0, 90, 0);
+						BedLocation bed = new BedLocation(imprisonedId, info);
 						BetterShardsAPI.addBedLocation(imprisonedId, bed);
 					}
 				}
@@ -228,43 +231,25 @@ public class PrisonPearlManager {
 		if (player != null) {
 			Location currentLoc = player.getLocation();
 			if (!player.isDead() && currentLoc.getWorld() == getImprisonWorld()) {
-				// if the player isn't dead and is in prison world
-				Location loc = null;
-				if (PrisonPearlConfig.getTpPearlOnFree()) { // if we tp to pearl on players being freed
-					loc = fuzzLocation(pp.getLocation()); // get the location of the pearl
-				}
-				
-				if (loc == null || loc instanceof FakeLocation){ // if we don't have a location yet
-					loc = getRespawnLocation(player, currentLoc); // get the respawn location for the player
-					if (loc == null)
-						return;
-				}
-				
-				if (loc == RESPAWN_PLAYER) { // if we're supposed to respawn the player
-					player.setHealth(0.0); // kill him
-				} else {
-					player.teleport(loc); // otherwise teleport
-				}
+				respawnPlayerCorrectly(player);
 			}
 			
 		}
 		// Log the free'ing PrisonPearl event with coordinates.
 		Player imprisoner = pp.getHolderPlayer();
 		String playerLoc = player != null ? serializeLocation(player.getLocation()) : "[???]";
-		String message = String.format("%s [%s] was freed", playerName, playerLoc);
+		String message = String.format("%s [%s] was freed", imprisoner.getName(), playerLoc);
 		
 		if (imprisoner != null) {
 			String imprisonerLoc = serializeLocation(imprisoner.getLocation());
 			message = String.format("%s [%s] was freed by %s [%s]", 
-											playerName, playerLoc,
-											imprisoner.getDisplayName(), imprisonerLoc);
+					imprisoner.getName(), playerLoc, imprisoner.getDisplayName(), imprisonerLoc);
 		} 
 		
 		PrisonPearlPlugin.log(message);
 		
 		if (player != null) {
 			player.sendMessage("You've been freed!");
-			broadcastman.broadcast(player, playerName + " was freed!");
 		}
 		return true;
 	}
@@ -401,5 +386,25 @@ public class PrisonPearlManager {
 	public boolean isItemStackPrisonPearl(PrisonPearl pp, ItemStack stack) {
 		PrisonPearl p = getPearlByItemStack(stack);
 		return p != null ? p.getImprisonedName().equals(pp.getImprisonedName()) : false;
+	}
+	
+	public void addPearl(PrisonPearl pp) {
+		storage.addPearl(pp);
+	}
+	
+	public void freePearlFromMercury(PrisonPearl pp, String reason, String server) {
+		storage.removePearl(pp, reason);
+		if (server != null && pp.getImprisonedPlayer() != null) {
+			try {
+				BetterShardsAPI.connectPlayer(pp.getImprisonedPlayer(), server, PlayerChangeServerReason.PLUGIN);
+			} catch (PlayerStillDeadException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void feedPearls() {
+		storage.feedPearls(this);
 	}
 }

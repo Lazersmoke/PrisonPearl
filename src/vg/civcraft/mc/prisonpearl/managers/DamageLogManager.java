@@ -9,6 +9,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.prisonpearl.DamageLog;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 
 public class DamageLogManager implements Runnable{
@@ -27,7 +28,7 @@ public class DamageLogManager implements Runnable{
 	public List<Player> getDamagers(Player player) {
 		DamageLog log = logs.get(player.getName());
 		if (log != null)
-			return log.getDamagers(plugin.getConfig().getInt("damagelog_min"));
+			return log.getDamagers(PrisonPearlConfig.getDamageLogMin());
 		else
 			return new ArrayList<Player>();
 	}
@@ -47,7 +48,7 @@ public class DamageLogManager implements Runnable{
 			logs.put(player.getName(), log);
 		}
 		
-		long ticks = plugin.getConfig().getInt("damagelog_ticks");
+		long ticks = PrisonPearlConfig.getDamagelogTicks();
 		log.recordDamage(damager, (int)amt, getNowTick() + ticks);
 		scheduleExpireTask(ticks);
 	}
@@ -63,7 +64,7 @@ public class DamageLogManager implements Runnable{
 			DamageLog log = i.next();
 			long remaining = nowtick-log.getExpiresTick();
 			
-			if (remaining <= plugin.getConfig().getInt("damagelog_ticks")/20) {
+			if (remaining <= PrisonPearlConfig.getDamagelogTicks()/20) {
 				i.remove();
 				continue;
 			}

@@ -63,6 +63,7 @@ public class Free extends PlayerCommand {
 			}
 			imprisonedID = pearl.getImprisonedId();
 		}
+		p.sendMessage(ChatColor.GREEN + "You have freed " + pearl.getImprisonedName() + ".");
 		manager.freePearl(pearl, "Freed by imprisoner");
 		return true;
 	}

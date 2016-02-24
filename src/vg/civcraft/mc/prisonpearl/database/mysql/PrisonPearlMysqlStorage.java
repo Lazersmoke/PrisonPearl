@@ -36,6 +36,7 @@ import vg.civcraft.mc.civmodcore.annotations.CivConfigs;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
 import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
@@ -58,7 +59,6 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		plugin = PrisonPearlPlugin.getInstance();
 		createTables();
 		initializeStatements();
-		load(); // Load pearls
 	}
 	
 	private void createTables() {
@@ -288,25 +288,17 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		return results;
 	}
 	
-	@CivConfigs({
-		@CivConfig(name = "ignore_feed.seconds", def = "0" , type = CivConfigType.Long),
-		@CivConfig(name = "ignore_feed.hours", def = "0" , type = CivConfigType.Long),
-		@CivConfig(name = "ignore_feed.days", def = "0" , type = CivConfigType.Long),
-		@CivConfig(name = "ignore_feed.feed_delay", def = "72000000" , type = CivConfigType.Long),
-		@CivConfig(name = "upkeep.resource", def = "263", type = CivConfigType.Int),
-		@CivConfig(name = "upkeep.quanity", def = "4" , type = CivConfigType.Int)
-	})
 	@Override
 	public String feedPearls(PrisonPearlManager pearlman) {
 		String message = "";
 		String log = "";
 		ConcurrentHashMap<UUID,PrisonPearl> map = new ConcurrentHashMap<UUID,PrisonPearl>(pearls);
 
-		long inactive_seconds = plugin.GetConfig().get("ignore_feed.seconds").getLong();
-		long inactive_hours = plugin.GetConfig().get("ignore_feed.hours").getLong();
-		long inactive_days = plugin.GetConfig().get("ignore_feed.days").getLong();
+		long inactive_seconds = PrisonPearlConfig.getIgnoreFeedSecond();
+		long inactive_hours = PrisonPearlConfig.getIngoreFeedHours();
+		long inactive_days = PrisonPearlConfig.getIngoreFeedDays();
 
-		long feedDelay = plugin.GetConfig().get("feed_delay").getLong();	//if pearls have been fed in the last x millis it wont feed, defaults to 20 hours
+		long feedDelay = PrisonPearlConfig.getIgnoreFeedDelay();	//if pearls have been fed in the last x millis it wont feed, defaults to 20 hours
 		if(getLastFeed() >= System.currentTimeMillis() - feedDelay) {
 			return "Pearls have already been fed, not gonna do it again just yet";
 		} else {
@@ -357,8 +349,8 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 				}
 			}
 			message = message + "Pearl Id: " + prisonerId + " in a " + pp.getHolderBlockState().getType();
-			ItemStack requirement = new ItemStack(plugin.GetConfig().get("upkeep.resource").getInt(), 
-					plugin.GetConfig().get("upkeep.quantity").getInt());
+			ItemStack requirement = new ItemStack(PrisonPearlConfig.getResourceUpkeepMaterial(), 
+					PrisonPearlConfig.getResourceUpkeepAmount());
 			int requirementSize = requirement.getAmount();
 
 			if(inv[0].containsAtLeast(requirement,requirementSize)) {

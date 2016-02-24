@@ -21,7 +21,6 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 
 	private Database db;
 	private PrisonPearlPlugin plugin;
-	private Config config;
 	
 	private PrisonPearlMysqlStorage ppStorage;
 	private PrisonPortaledMysqlStorage portaledStorage;
@@ -30,7 +29,6 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 	
 	public MysqlDatabaseHandler() {
 		plugin = PrisonPearlPlugin.getInstance();
-		config = plugin.GetConfig();
 		initializeDB();
 		initializeStorageManagers();
 	}
@@ -78,14 +76,18 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 
 	@Override
 	public void save() {
-		// TODO Auto-generated method stub
-		
+		ppStorage.save();
+		portaledStorage.save();
+		summonStorage.save();
+		worldBorderStorage.save();
 	}
 
 	@Override
 	public void load() {
-		// TODO Auto-generated method stub
-		
+		ppStorage.load();
+		portaledStorage.load();
+		summonStorage.load();
+		worldBorderStorage.load();
 	}
 	
 	protected void refreshAndReconnect() {

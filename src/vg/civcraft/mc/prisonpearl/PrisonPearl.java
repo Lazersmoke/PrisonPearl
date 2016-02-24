@@ -201,7 +201,7 @@ public class PrisonPearl {
 			String server = fake.getServerName();
 			if (player != null)
 				return player + " on server " + server;
-			return "on server " + server;
+			return "another server " + server;
 		} else {
 			// PrisonPearlPlugin.info("PrisonPearl " + imprisonedId.toString() +
 			// " has no player, item, nor location");

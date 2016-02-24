@@ -5,7 +5,14 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
 import vg.civcraft.mc.civmodcore.ACivMod;
+import vg.civcraft.mc.prisonpearl.command.PrisonPearlCommandHandler;
 import vg.civcraft.mc.prisonpearl.database.DataBaseHandler;
+import vg.civcraft.mc.prisonpearl.listener.AltsListListener;
+import vg.civcraft.mc.prisonpearl.listener.BanListener;
+import vg.civcraft.mc.prisonpearl.listener.DamageListener;
+import vg.civcraft.mc.prisonpearl.listener.MercuryListener;
+import vg.civcraft.mc.prisonpearl.listener.PlayerListener;
+import vg.civcraft.mc.prisonpearl.listener.PrisonPortaledPlayerListener;
 import vg.civcraft.mc.prisonpearl.managers.AltsListManager;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
@@ -42,6 +49,10 @@ public class PrisonPearlPlugin extends ACivMod {
 		dbHandle = new DataBaseHandler();
 		handleManagers();
 		handleListeners();
+		// Register commands.
+		PrisonPearlCommandHandler handle = new PrisonPearlCommandHandler();
+		setCommandHandler(handle);
+		handle.registerCommands();
 	}
 	
 	public void onDisable() {
@@ -52,7 +63,7 @@ public class PrisonPearlPlugin extends ACivMod {
 		altsManager = new AltsListManager();
 		banManager = BanManager.initialize();
 		broadManager = new BroadcastManager();
-		combatManager = new CombatTagManager();
+		combatManager = new CombatTagManager(plugin.getServer(), plugin.getLogger());
 		damageManager = new DamageLogManager();
 		mercuryManager = new MercuryManager();
 		namelayerManager = new NameLayerManager();
@@ -63,7 +74,12 @@ public class PrisonPearlPlugin extends ACivMod {
 	}
 	
 	private void handleListeners() {
-		
+		new AltsListListener();
+		new BanListener();
+		new DamageListener();
+		new MercuryListener();
+		new PlayerListener();
+		new PrisonPortaledPlayerListener();
 	}
 	
 	@Override
