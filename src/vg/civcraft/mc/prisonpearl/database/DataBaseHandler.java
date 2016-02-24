@@ -3,6 +3,7 @@ package vg.civcraft.mc.prisonpearl.database;
 import vg.civcraft.mc.civmodcore.Config;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.flatfile.FlatFileHandler;
 import vg.civcraft.mc.prisonpearl.database.interfaces.ISaveLoad;
@@ -40,7 +41,7 @@ public class DataBaseHandler {
 	
 	@CivConfig(name = "database.type", def = "0", type = CivConfigType.Int)
 	public DbType getDataBaseType() {
-		int type = config.get("database.type").getInt();
+		int type = PrisonPearlConfig.getDatabaseType();
 		switch(type) {
 		case 0:
 			return DbType.FLATFILE;

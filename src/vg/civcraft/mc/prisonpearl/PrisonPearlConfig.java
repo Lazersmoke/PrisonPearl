@@ -58,6 +58,11 @@ public class PrisonPearlConfig {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("database.mysql.port").getInt();
 	}
 	
+	@CivConfig(name = "database.type", def = "0", type = CivConfigType.Int)
+	public static int getDatabaseType() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("database.type").getInt();
+	}
+	
 	@CivConfig(name = "free_tppearl", def = "true", type = CivConfigType.Bool)
 	public static boolean shouldTpPearlOnFree() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("free_tppearl").getBool();
