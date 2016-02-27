@@ -31,8 +31,6 @@ public class BanListener implements Listener{
 		sb.append("Alt-Ban-Info: ");
 		sb.append("UUID: " + uuidName.toString());
 		sb.append(" EventLoginResult: " + event.getLoginResult().toString());
-		alts.cacheAltListFor(uuidName); // Caches the player's alts. Receiving the alt list will handle
-		// the same thing as checkban.
 		if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
 			return;
 		}
