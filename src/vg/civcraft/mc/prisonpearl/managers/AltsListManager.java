@@ -1,6 +1,8 @@
 package vg.civcraft.mc.prisonpearl.managers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +48,9 @@ public class AltsListManager implements Listener {
 	}
 	
 	public List<UUID> getAlts(UUID uuid) {
-		return altsHash.get(uuid);
+		List<UUID> list = new ArrayList<UUID>();
+		list.addAll(Arrays.asList(getAltsArray(uuid)));
+		return list;
 	}
 
 	public UUID[] getAltsArray(UUID uuid) {

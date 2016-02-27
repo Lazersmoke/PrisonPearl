@@ -10,15 +10,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.managers.AltsListManager;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 
 public class BanListener implements Listener{
 	
 	private BanManager ban;
+	private AltsListManager alts;
 	
 	public BanListener() {
 		Bukkit.getPluginManager().registerEvents(this, PrisonPearlPlugin.getInstance());
 		ban = PrisonPearlPlugin.getBanManager();
+		alts = PrisonPearlPlugin.getAltsListManager();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -28,7 +31,8 @@ public class BanListener implements Listener{
 		sb.append("Alt-Ban-Info: ");
 		sb.append("UUID: " + uuidName.toString());
 		sb.append(" EventLoginResult: " + event.getLoginResult().toString());
-		ban.checkBan(uuidName); // Checks if the player should or should not be banned.
+		alts.cacheAltListFor(uuidName); // Caches the player's alts. Receiving the alt list will handle
+		// the same thing as checkban.
 		if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
 			return;
 		}
