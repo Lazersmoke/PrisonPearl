@@ -24,7 +24,7 @@ public class BanListener implements Listener{
 		alts = PrisonPearlPlugin.getAltsListManager();
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
 		StringBuilder sb = new StringBuilder();
 		final UUID uuidName = event.getUniqueId();
