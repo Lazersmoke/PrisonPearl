@@ -9,6 +9,7 @@ import vg.civcraft.mc.prisonpearl.command.PrisonPearlCommandHandler;
 import vg.civcraft.mc.prisonpearl.database.DataBaseHandler;
 import vg.civcraft.mc.prisonpearl.listener.AltsListListener;
 import vg.civcraft.mc.prisonpearl.listener.BanListener;
+import vg.civcraft.mc.prisonpearl.listener.BetterShardsListener;
 import vg.civcraft.mc.prisonpearl.listener.CombatTagListener;
 import vg.civcraft.mc.prisonpearl.listener.DamageListener;
 import vg.civcraft.mc.prisonpearl.listener.MercuryListener;
@@ -83,6 +84,7 @@ public class PrisonPearlPlugin extends ACivMod {
 		new PlayerListener();
 		new PrisonPortaledPlayerListener();
 		new CombatTagListener();
+		new BetterShardsListener();
 	}
 	
 	@Override

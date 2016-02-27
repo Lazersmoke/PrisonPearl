@@ -33,6 +33,8 @@ public class MercuryListener implements Listener{
 	private BroadcastManager bm;
 	
 	public MercuryListener() {
+		if (!PrisonPearlPlugin.isMercuryEnabled())
+			return;
 		Bukkit.getPluginManager().registerEvents(this, PrisonPearlPlugin.getInstance());
 		pearls = PrisonPearlPlugin.getPrisonPearlManager();
 		sm = PrisonPearlPlugin.getSummonManager();

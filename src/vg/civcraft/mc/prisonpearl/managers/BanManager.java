@@ -71,7 +71,7 @@ public abstract class BanManager{
 		if (pearledCount >= maxImprisonedAlts) {
 			if (!storage.isImprisoned(id)) {
 				banAndKick(id, pearledCount, names);
-				return 2;
+				return maxImprisonedAlts;
 			}
 			int count = 0;
 			for (UUID imprisonedName : imprisonedNames) {
@@ -80,7 +80,7 @@ public abstract class BanManager{
 				}
 				if (count >= maxImprisonedAlts) {
 					banAndKick(id, pearledCount, names);
-					return 2;
+					return maxImprisonedAlts;
 				}
 			}
 		} else if (isBanned(id)) {

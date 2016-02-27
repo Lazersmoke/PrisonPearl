@@ -71,7 +71,12 @@ public class MercuryManager {
 		if (pp.getHolderPlayer() != null)
 			playerName = pp.getHolderPlayer().getDisplayName();
 		UUID uuid = pp.getImprisonedId();
-		String message = "update|" + type.name() + "|" + uuid.toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + 
+		String worldName = "";
+		if (loc instanceof FakeLocation)
+			worldName = ((FakeLocation) loc).getWorldName();
+		else
+			worldName = loc.getWorld().getName();
+		String message = "update|" + type.name() + "|" + uuid.toString() + "|" + worldName + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + 
 		loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}

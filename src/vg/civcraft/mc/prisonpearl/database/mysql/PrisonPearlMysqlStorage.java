@@ -619,7 +619,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	@Override
 	public PrisonPearl newPearl(String imprisonedName, UUID imprisonedId, Player imprisoner) {
 		Random rand = new Random();
-		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner, rand.nextInt(1000));
+		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner, rand.nextInt(1000000000));
 		addPearl(pp);
 		return pp;
 	}

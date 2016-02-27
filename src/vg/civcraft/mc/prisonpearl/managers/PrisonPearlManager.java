@@ -63,7 +63,7 @@ public class PrisonPearlManager {
 		storage = dbHandler.getStorageHandler().getPrisonPearlStorage();
 		banManager = PrisonPearlPlugin.getBanManager();
 		
-		storage.feedPearls(this);
+		feedPearls();
 	}
 	
 	public boolean imprisonPlayer(Player imprisoned, Player imprisoner) {
