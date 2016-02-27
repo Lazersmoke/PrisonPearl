@@ -35,6 +35,7 @@ public class FreeAny extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "This player is not imprisoned");
 			return true;
 		}
+		pearl = manager.getByImprisoned(imprisonedID);
 		manager.freePearl(pearl, "Freed by admin");
 		return true;
 	}
