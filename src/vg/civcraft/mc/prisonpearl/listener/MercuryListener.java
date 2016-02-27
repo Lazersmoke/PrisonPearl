@@ -79,7 +79,7 @@ public class MercuryListener implements Listener{
 		loc = new FakeLocation(message[3], Double.parseDouble(message[4]), Double.parseDouble(message[5]),
 				Double.parseDouble(message[6]), server, name);
 		int unique = Integer.parseInt(message[7]);
-		String motd = message[9];
+		String motd = message[8];
 		
 		if (type.equals(PrisonPearlEvent.Type.NEW)) {
 			PrisonPearl pp = new PrisonPearl(name, id, loc, unique);

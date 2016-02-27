@@ -139,9 +139,16 @@ public class PlayerListener implements Listener {
 
 	// adjust spawnpoint if necessary
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerRespawn(PlayerRespawnEvent event) {
+	public void onPlayerRespawn(final PlayerRespawnEvent event) {
 		prisonMotd(event.getPlayer());
-		respawnPlayerCorrectly(event.getPlayer());
+		Bukkit.getScheduler().runTask(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+			@Override
+			public void run() {
+				respawnPlayerCorrectly(event.getPlayer());
+			}
+			
+		});
 	}
 
 	// called when a player joins or spawns
