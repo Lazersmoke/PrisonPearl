@@ -34,6 +34,7 @@ public class ImprisonAny extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "That player does not exist");
 			return true;
 		}
+		p.setHealth(0.0);
 		manager.imprisonPlayer(imprisonedID, p);		
 		return true;
 	}

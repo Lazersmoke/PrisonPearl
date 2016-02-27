@@ -84,6 +84,8 @@ public class BroadcastManager {
 	 */
 	public void broadcast(UUID pearled) {
 		List<UUID> uuids = broadcasts.get(pearled);
+		if (uuids == null)
+			return;
 		MercuryManager.sendBroadcast(pearled, uuids);
 		PrisonPearl pp = PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(pearled);
 		for (UUID uuid: uuids) {
