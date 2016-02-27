@@ -232,7 +232,14 @@ public class PrisonPearl {
 		final Holder holder = this.holders.peekFirst();
 		final Location loc = getLocation(holder);
 		final Vector vec = loc.toVector();
-		final String str = loc.getWorld().getName() + " " + vec.getBlockX() + " " + vec.getBlockY() + " " + vec.getBlockZ();
+		final String str;
+		if (loc instanceof FakeLocation) {
+			FakeLocation fakeLoc = (FakeLocation) loc;
+			str = fakeLoc.getWorldName() + " " + fakeLoc.getBlockX() + " " + fakeLoc.getBlockY() + " " + 
+					fakeLoc.getBlockZ();
+		}
+		else 
+			str = loc.getWorld().getName() + " " + vec.getBlockX() + " " + vec.getBlockY() + " " + vec.getBlockZ();
 		return "held by " + getHolderName(holder) + " at " + str;
 	}
 

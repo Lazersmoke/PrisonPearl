@@ -157,4 +157,15 @@ public class PrisonPearlConfig {
 	public static int getSummonDamageAmount() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("summon_damage_amt").getInt();
 	}
+	
+	@CivConfig(name = "kickMessage", def = "You have too many imprisoned alts! "
+			+ "If you think this is an error, please message the mods on /r/civcraft", type = CivConfigType.String)
+	public static String getKickMessage() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("kickMessage").getString();
+	}
+	
+	@CivConfig(name = "alts.max_imprisoned", def = "2", type = CivConfigType.Int)
+	public static int getMaxAltsAllowed() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("alts.max_imprisoned").getInt();
+	}
 }

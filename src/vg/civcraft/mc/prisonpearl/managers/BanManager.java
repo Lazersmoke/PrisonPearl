@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
 import vg.civcraft.mc.namelayer.NameAPI;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
 import vg.civcraft.mc.prisonpearl.managers.ban.CBanManager;
@@ -52,12 +53,10 @@ public abstract class BanManager{
 	private static PrisonPearlPlugin plugin;
 	private static IPrisonPearlStorage storage;
 	
-	@CivConfig(name = "alts.max_imprisoned", def = "2", type = CivConfigType.Int)
 	public int checkBan(UUID id) {
 		AltsListManager altsList = PrisonPearlPlugin.getAltsListManager();
-		PrisonPearlManager pearls = PrisonPearlPlugin.getPrisonPearlManager();
 		
-		int maxImprisonedAlts = plugin.GetConfig().get("alts.max_imprisoned").getInt();
+		int maxImprisonedAlts = PrisonPearlConfig.getMaxAltsAllowed();
 		UUID[] alts = altsList.getAltsArray(id);
 		Integer pearledCount = storage.getImprisonedCount(alts);
 		UUID[] imprisonedNames = storage.getImprisonedIds(alts);
@@ -102,10 +101,8 @@ public abstract class BanManager{
 			checkBan(alt);
 	}
 
-	@CivConfig(name = "kickMessage", def = "You have too many imprisoned alts! "
-			+ "If you think this is an error, please message the mods on /r/civcraft", type = CivConfigType.String)
 	private void banAndKick(UUID id, int pearledCount, String names) {
-		String kickMessage = plugin.GetConfig().get("kickMessage").getString();
+		String kickMessage = PrisonPearlConfig.getKickMessage();
 		Player p = Bukkit.getPlayer(id);
 		if (p != null) {
 			p.kickPlayer(kickMessage);

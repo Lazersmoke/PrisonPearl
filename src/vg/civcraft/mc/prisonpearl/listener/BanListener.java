@@ -28,6 +28,7 @@ public class BanListener implements Listener{
 		sb.append("Alt-Ban-Info: ");
 		sb.append("UUID: " + uuidName.toString());
 		sb.append(" EventLoginResult: " + event.getLoginResult().toString());
+		ban.checkBan(uuidName); // Checks if the player should or should not be banned.
 		if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
 			return;
 		}
