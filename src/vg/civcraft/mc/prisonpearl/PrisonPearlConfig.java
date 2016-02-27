@@ -168,4 +168,14 @@ public class PrisonPearlConfig {
 	public static int getMaxAltsAllowed() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("alts.max_imprisoned").getInt();
 	}
+	
+	@CivConfig(name = "deny_pearls_worlds", def = "", type = CivConfigType.String_List)
+	public static List<String> getPearlDenyTransferWorlds() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("deny_pearls_worlds").getStringList();
+	}
+	
+	@CivConfig(name = "prison.unloadTimerTicks", def = "1200", type = CivConfigType.Int)
+	public static int getPrisonUnloadTimerTicks() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.unloadTimerTicks").getInt();
+	}
 }
