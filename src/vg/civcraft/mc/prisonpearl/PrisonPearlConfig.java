@@ -105,7 +105,7 @@ public class PrisonPearlConfig {
 	
 	@CivConfig(name = "ignore_feed.feed_delay", def = "72000000" , type = CivConfigType.Long)
 	public static long getIgnoreFeedDelay() {
-		return PrisonPearlPlugin.getInstance().GetConfig().get("feed_delay").getLong();
+		return PrisonPearlPlugin.getInstance().GetConfig().get("ignore_feed.feed_delay").getLong();
 	}
 	
 	@CivConfig(name = "upkeep.resource", def = "263", type = CivConfigType.Int)

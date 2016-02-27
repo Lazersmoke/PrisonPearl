@@ -20,7 +20,7 @@ public class ConfirmBroadcast extends PlayerCommand{
 	
 	public ConfirmBroadcast(String name) {
 		super(name);
-		setIdentifier("ppconfirmbroadcast");
+		setIdentifier("ppconfirm");
 		setDescription("Confirms a broadcast for a pearled player.");
 		setUsage("/ppconfirm <pearled player>");
 		setArguments(1, 1);

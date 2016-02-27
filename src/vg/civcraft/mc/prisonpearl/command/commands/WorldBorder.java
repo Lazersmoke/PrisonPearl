@@ -19,9 +19,9 @@ public class WorldBorder extends PlayerCommand{
 	
 	public WorldBorder(String name) {
 		super(name);
-		setIdentifier("ppworldborder");
+		setIdentifier("ppwb");
 		setDescription("Adds or removes an exception to world border pearl feeding.");
-		setUsage("/ppworldborder <add/remove> world x y z");
+		setUsage("/ppwb <add/remove> world x y z");
 		setArguments(5,5);
 		wb = PrisonPearlPlugin.getWorldBorderManager();
 	}

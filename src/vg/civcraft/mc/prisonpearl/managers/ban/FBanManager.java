@@ -41,11 +41,10 @@ public class FBanManager extends BanManager {
 	}
 
 	@Override
-	public BanManager enable() {
+	public void enable() {
 		loadBanJournal();
 		rotateBanJournal();
 		writeBanJournal();
-		return this;
 	}
 
 	@Override

@@ -21,7 +21,7 @@ public class SetDistance extends PlayerCommand{
 	
 	public SetDistance(String name) {
 		super(name);
-		setIdentifier("ppsetdistance");
+		setIdentifier("ppsetdist");
 		setDescription("Sets the max distance that a summoned player can be from his pearl before"
 				+ " taking damage.");
 		setUsage("/ppsetdist <max distance>");

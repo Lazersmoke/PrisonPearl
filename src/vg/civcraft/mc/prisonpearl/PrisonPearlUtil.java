@@ -23,12 +23,10 @@ import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class PrisonPearlUtil {
 
-	private static IPrisonPearlStorage pearls;
 	private static PrisonPearlManager manager;
 	private static SummonManager summon;
 	
 	public PrisonPearlUtil() {
-		pearls = PrisonPearlPlugin.getDBHandler().getStorageHandler().getPrisonPearlStorage();
 		manager = PrisonPearlPlugin.getPrisonPearlManager();
 		summon = PrisonPearlPlugin.getSummonManager();
 	}
@@ -50,7 +48,7 @@ public class PrisonPearlUtil {
 		UUID uuid = p.getUniqueId();
 		boolean freeToPearl = PrisonPearlConfig.shouldTpPearlOnFree();
 		if (PrisonPearlPlugin.isBetterShardsEnabled() && PrisonPearlPlugin.isMercuryEnabled()) {
-			if (pearls.isImprisoned(uuid)) {
+			if (manager.isImprisoned(uuid)) {
 				String server = MercuryAPI.serverName();
 				String toServer = manager.getImprisonServer();
 				if (!server.equals(toServer)) {
@@ -115,7 +113,7 @@ public class PrisonPearlUtil {
 			return false;
 		}
 		// This part will deal for when bettershards and mercury are not enabled.
-		else if (pearls.isImprisoned(uuid)) {
+		else if (manager.isImprisoned(uuid)) {
 			Location newLoc = manager.getPrisonSpawnLocation();
 			p.teleport(newLoc);
 			return true;

@@ -32,14 +32,13 @@ public final class CBanManager extends BanManager {
 	}
 
 	@Override
-	public BanManager enable() {
+	public void enable() {
 		// refresh ban understanding from CBan, if needed.
-		if (this.plugin_.getServer().getPluginManager().isPluginEnabled("CBanManagement")) {
+		if (PrisonPearlPlugin.isCBanManagementEnabled()) {
 			cban = CBanManagement.getInstance();
 		} else {
 			PrisonPearlPlugin.log("Failed to activate CBanManagement!");
 		}
-		return this;
 	}
 
 	@Override

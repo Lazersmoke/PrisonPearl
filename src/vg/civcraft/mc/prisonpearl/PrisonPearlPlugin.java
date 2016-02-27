@@ -53,6 +53,7 @@ public class PrisonPearlPlugin extends ACivMod {
 		PrisonPearlCommandHandler handle = new PrisonPearlCommandHandler();
 		setCommandHandler(handle);
 		handle.registerCommands();
+		new PrisonPearlUtil();
 	}
 	
 	public void onDisable() {

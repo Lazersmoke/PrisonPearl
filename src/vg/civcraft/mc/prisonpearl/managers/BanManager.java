@@ -23,7 +23,7 @@ import vg.civcraft.mc.prisonpearl.managers.ban.FBanManager;
  */
 public abstract class BanManager{
 
-	public abstract BanManager enable();
+	public abstract void enable();
 	public abstract void setBanMessage(String msg);
 	public abstract String getBanMessage();
 	public abstract boolean isBanned(UUID uuidName);
@@ -36,10 +36,17 @@ public abstract class BanManager{
 	public static BanManager initialize() {
 		plugin = PrisonPearlPlugin.getInstance();
 		storage = PrisonPearlPlugin.getDBHandler().getStorageHandler().getPrisonPearlStorage();
+		BanManager ban;
 		if (PrisonPearlPlugin.isCBanManagementEnabled()) {
-			return new CBanManager(plugin);
+			ban = new CBanManager(plugin);
+			ban.enable();
+			return ban;
 		}
-		else return new FBanManager(plugin);
+		else {
+			ban = new FBanManager(plugin);
+			ban.enable();
+			return ban;
+		}
 	}
 	
 	private static PrisonPearlPlugin plugin;
