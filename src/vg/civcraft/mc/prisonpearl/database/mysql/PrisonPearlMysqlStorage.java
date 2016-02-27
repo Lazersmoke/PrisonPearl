@@ -132,6 +132,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 
 	@Override
 	public void removePearl(PrisonPearl pp, String reason) {
+		handle.refreshAndReconnect();
 		PrisonPearlPlugin.log(reason);
 		pearls.remove(pp.getImprisonedId());
 		PreparedStatement removePearl = db.prepareStatement(this.removePearl);
@@ -146,6 +147,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	
 	@Override
 	public void load() {
+		handle.refreshAndReconnect();
 		PreparedStatement getAllPearls = db.prepareStatement(this.getAllPearls);
 		try {
 			ResultSet set = getAllPearls.executeQuery();
@@ -189,6 +191,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 
 	@Override
 	public void updatePearl(PrisonPearl pp) {
+		handle.refreshAndReconnect();
 		Location loc = pp.getLocation();
 		if (loc instanceof FakeLocation)
 			return;
@@ -209,6 +212,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	
 	@Override
 	public void updateLastFeed(long lastFeed) {
+		handle.refreshAndReconnect();
 		this.lastFeed = lastFeed;
 		String server = "bukkit";
 		if (isMercuryEnabled)
@@ -228,6 +232,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	 */
 	@Override
 	public long getLastFeed() {
+		handle.refreshAndReconnect();
 		if (lastFeed != 0)
 			return lastFeed;
 		try {
@@ -621,6 +626,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 
 	@Override
 	public PrisonPearl getByImprisoned(UUID uuid) {
+		handle.refreshAndReconnect();
 		PrisonPearl pp = null;
 		if ((pp = pearls.get(uuid)) != null)
 			return pp;

@@ -12,7 +12,7 @@ public class PrisonPortaledPlayerManager {
 	private IPrisonPortaledStorage storage;
 	
 	public PrisonPortaledPlayerManager() {
-		PrisonPearlPlugin.getDBHandler().getStorageHandler().getPrisonPearlStorage();
+		storage = PrisonPearlPlugin.getDBHandler().getStorageHandler().getPrisonPortaledStorage();
 	}
 	
 	public boolean isPlayerPortaledToPrison(Player player) {
