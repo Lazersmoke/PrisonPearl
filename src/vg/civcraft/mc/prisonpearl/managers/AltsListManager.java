@@ -14,15 +14,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.events.AltsListEvent;
 import vg.civcraft.mc.prisonpearl.events.RequestAltsListEvent;
+import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class AltsListManager implements Listener {
 	private HashMap<UUID, List<UUID>> altsHash;
 
 	public AltsListManager() {
 		altsHash = new HashMap<UUID, List<UUID>>();
+		// We are going to speed up some altsList that we know we will need.
+		// Only querry for the pearls on this server since the other servers will do the same for themselves.
+		List<UUID> uuids = new ArrayList<UUID>();
+		for (PrisonPearl pp: PrisonPearlPlugin.getDBHandler().getStorageHandler().getPrisonPearlStorage().getAllPearls())
+			if (!(pp.getLocation() instanceof FakeLocation))
+				uuids.add(pp.getImprisonedId());
+		queryForUpdatedAltLists(uuids);
 	}
 
 	public void queryForUpdatedAltLists(List<UUID> playersToCheck) {

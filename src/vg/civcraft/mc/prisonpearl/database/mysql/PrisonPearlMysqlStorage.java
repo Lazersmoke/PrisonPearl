@@ -110,6 +110,9 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		if (isImprisoned(pp.getImprisonedId())) {
 			pearls.put(pp.getImprisonedId(), pp);
 		}
+		
+		if (pp.getLocation() instanceof FakeLocation)
+			return;
 		handle.refreshAndReconnect();
 		PreparedStatement addPearl = db.prepareStatement(this.addPearl);
 		try {

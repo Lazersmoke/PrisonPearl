@@ -41,7 +41,8 @@ public class ImprisonAny extends PlayerCommand {
 		if (Bukkit.getPlayer(imprisonedID) != null) // If on the server kill.
 			Bukkit.getPlayer(imprisonedID).setHealth(0.0);
 		
-		manager.imprisonPlayer(imprisonedID, p);		
+		manager.imprisonPlayer(imprisonedID, p);
+		p.sendMessage(ChatColor.GREEN + "You have imprisoned the player.");
 		return true;
 	}
 	
@@ -49,11 +50,13 @@ public class ImprisonAny extends PlayerCommand {
 		List<String> list = new ArrayList<String>();
 		if (PrisonPearlPlugin.isMercuryEnabled()) {
 			for (String x: MercuryAPI.getAllPlayers())
-				list.add(x);
+				if (x.startsWith(args[0]))
+					list.add(x);
 			return list;
 		}
 		for (Player x: Bukkit.getOnlinePlayers())
-			list.add(x.getDisplayName());
+			if (x.getDisplayName().startsWith(args[0]))
+				list.add(x.getDisplayName());
 		return list;
 	}
 }

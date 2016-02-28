@@ -16,27 +16,37 @@ import vg.civcraft.mc.prisonpearl.events.AltsListEvent;
 import vg.civcraft.mc.prisonpearl.managers.AltsListManager;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 
-public class AltsListListener implements Listener{
+public class AltsListListener implements Listener {
 
 	private BanManager ban;
 	private AltsListManager altsManager;
-	
+
 	public AltsListListener() {
 		Bukkit.getPluginManager().registerEvents(this, PrisonPearlPlugin.getInstance());
 		ban = PrisonPearlPlugin.getBanManager();
 		altsManager = PrisonPearlPlugin.getAltsListManager();
 	}
-	
+
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onAltsListUpdate(AltsListEvent event) {
-			PrisonPearlPlugin
-					.log("Grabbing alts for players");
+	public void onAltsListUpdate(final AltsListEvent event) {
+		Bukkit.getScheduler().runTaskAsynchronously(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+			@Override
+			public void run() {
+				runAltlistEvent(event);
+			}
+			
+		});
+			
+	}
+
+	private void runAltlistEvent(AltsListEvent event) {
+		PrisonPearlPlugin.log("Grabbing alts for players");
 		final List<UUID> altsList = event.getAltsList();
 		// Save the old alt lists in their entirety to reduce all the cross
 		// checking
 		// players for existence within the Set.
-		final Set<List<UUID>> banListsToCheck = new HashSet<List<UUID>>(
-				altsList.size());
+		final Set<List<UUID>> banListsToCheck = new HashSet<List<UUID>>(altsList.size());
 		final List<UUID> normalizedList = new ArrayList<UUID>(altsList.size());
 		for (UUID playerUUID : altsList) {
 			normalizedList.add(playerUUID);
@@ -45,8 +55,7 @@ public class AltsListListener implements Listener{
 		}
 		// Unroll the ban lists into the playerBansToCheck. Only need a single
 		// account from the banlist we just built to check it.
-		final Set<UUID> playerBansToCheck = new HashSet<UUID>(
-				banListsToCheck.size() * 10);
+		final Set<UUID> playerBansToCheck = new HashSet<UUID>(banListsToCheck.size() * 10);
 		playerBansToCheck.add(normalizedList.get(0));
 		for (List<UUID> banList : banListsToCheck) {
 			playerBansToCheck.addAll(banList);
@@ -72,6 +81,7 @@ public class AltsListListener implements Listener{
 				total++;
 			}
 		}
-		PrisonPearlPlugin.log(bannedCount + " players were banned, " + unbannedCount + " were unbanned out of " + total + " accounts.");
+		PrisonPearlPlugin.log(bannedCount + " players were banned, " + unbannedCount + " were unbanned out of " + total
+				+ " accounts.");
 	}
 }
