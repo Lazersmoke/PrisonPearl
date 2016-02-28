@@ -218,8 +218,11 @@ public class PlayerListener implements Listener {
 			if (PrisonPearlConfig.getMustPrisonPearlHotBar() && firstpearl > 9) // bail if it must be in the hotbar
 				continue; 
 				
-			if (pearls.imprisonPlayer(uuid, damager)) // otherwise, try to imprison
+			if (pearls.imprisonPlayer(uuid, damager)) {// otherwise, try to imprison
+				damager.sendMessage(ChatColor.GREEN + "You have imprisoned " + player.getDisplayName());
+				player.sendMessage(ChatColor.GREEN + "You have been imprisoned by " + damager.getDisplayName());
 				break;
+			}
 		}
 	}
 	

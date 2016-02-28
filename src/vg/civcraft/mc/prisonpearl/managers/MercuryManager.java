@@ -150,7 +150,9 @@ public class MercuryManager {
 				if (p.getUniqueId().equals(uuid))
 					return true;
 		else
-			return MercuryAPI.getAllAccounts().contains(uuid);
+			for (UUID x: MercuryAPI.getAllAccounts())
+				if (x.equals(uuid))
+					return true;
 		return false;
 	}
 	
@@ -160,7 +162,9 @@ public class MercuryManager {
 				if (p.getName().equals(name))
 					return true;
 		else
-			return MercuryAPI.getAllPlayers().contains(name);
+			for (String x: MercuryAPI.getAllPlayers())
+				if (x.equalsIgnoreCase(name))
+					return true;
 		return false;
 	}
 }

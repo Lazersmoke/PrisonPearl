@@ -1,14 +1,17 @@
 package vg.civcraft.mc.prisonpearl.command.commands;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
+import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
@@ -22,7 +25,7 @@ public class ImprisonAny extends PlayerCommand {
 		setArguments(1, 1);
 	}
 	
-	public boolean execute(CommandSender sender, String [] args) {
+	public boolean execute(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "You must be a player to do this");
 			return true;
@@ -34,12 +37,23 @@ public class ImprisonAny extends PlayerCommand {
 			sender.sendMessage(ChatColor.RED + "That player does not exist");
 			return true;
 		}
-		p.setHealth(0.0);
+		
+		if (Bukkit.getPlayer(imprisonedID) != null) // If on the server kill.
+			Bukkit.getPlayer(imprisonedID).setHealth(0.0);
+		
 		manager.imprisonPlayer(imprisonedID, p);		
 		return true;
 	}
 	
-	public List <String> tabComplete(CommandSender sender, String [] args) {
-		return new LinkedList <String> (); //empty list
+	public List<String> tabComplete(CommandSender sender, String [] args) {
+		List<String> list = new ArrayList<String>();
+		if (PrisonPearlPlugin.isMercuryEnabled()) {
+			for (String x: MercuryAPI.getAllPlayers())
+				list.add(x);
+			return list;
+		}
+		for (Player x: Bukkit.getOnlinePlayers())
+			list.add(x.getDisplayName());
+		return list;
 	}
 }

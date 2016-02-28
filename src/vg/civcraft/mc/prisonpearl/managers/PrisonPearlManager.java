@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachment;
 
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
+import vg.civcraft.mc.bettershards.BetterShardsPlugin;
 import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.BedLocation;
 import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
@@ -70,7 +71,7 @@ public class PrisonPearlManager {
 		return imprisonPlayer(imprisoned.getUniqueId(), imprisoner);
 	}
 
-	public boolean imprisonPlayer(UUID imprisonedId, Player imprisoner) {		
+	public boolean imprisonPlayer(UUID imprisonedId, Player imprisoner) {	
 		altsManager.cacheAltListFor(imprisonedId);
 		
 		// set up the imprisoner's inventory
@@ -135,6 +136,12 @@ public class PrisonPearlManager {
 
 		// create the prison pearl
 		String name = NameLayerManager.getName(imprisonedId);
+		
+		// Lets check if the pearls exists and if so remove it.
+		PrisonPearl potentialPearl = storage.getByImprisoned(imprisonedId);
+		if (potentialPearl != null) {
+			storage.removePearl(potentialPearl, "Pearl removed because they were reimprisoned.");
+		}
 		
 		PrisonPearl pp = storage.newPearl(name, imprisonedId, imprisoner);
 		// set off an event
@@ -312,6 +319,9 @@ public class PrisonPearlManager {
 	// hill climbing algorithm which attempts to randomly spawn prisoners while actively avoiding pits
 	// the obsidian pillars, or lava.
 	public Location getPrisonSpawnLocation() {
+		if (PrisonPearlPlugin.isBetterShardsEnabled()) {
+			return BetterShardsPlugin.getRandomSpawn().getLocation();
+		}
 		Random rand = new Random();
 		Location loc = getImprisonWorld().getSpawnLocation(); // start at spawn
 		for (int i=0; i<30; i++) { // for up to 30 iterations

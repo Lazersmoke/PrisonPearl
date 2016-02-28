@@ -88,6 +88,12 @@ public class MercuryListener implements Listener{
 			pp.setMotd(motd);
 			pp.setHolder(loc);
 			pearls.addPearl(pp);
+			// We are also going to check if the player is here, if they are kill them.
+			Player p;
+			if ((p = Bukkit.getPlayer(id)) != null) {
+				p.setHealth(0.0);
+				p.sendMessage(ChatColor.RED + "You have been imprisoned by " + loc.getPlayer());
+			}
 			return;
 		}
 		else if (type.equals(PrisonPearlEvent.Type.DROPPED) ||
@@ -195,6 +201,7 @@ public class MercuryListener implements Listener{
 		}
 		else if (type.equals("send")) {
 			PrisonPearl pp = pearls.getByImprisoned(UUID.fromString(parts[2]));
+			pp.verifyLocation(); // Verify that the pearl is where we think it is.
 			for (int x = 3; x < parts.length; x++) {
 				Player p = Bukkit.getPlayer(UUID.fromString(parts[x]));
 				if (p == null)

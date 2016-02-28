@@ -11,6 +11,7 @@ import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.managers.NameLayerManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 
 public class FreeAny extends PlayerCommand {
@@ -26,7 +27,7 @@ public class FreeAny extends PlayerCommand {
 		UUID imprisonedID;
 		PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 		PrisonPearl pearl = null;
-		imprisonedID = NameAPI.getUUID(args[0]);
+		imprisonedID = NameLayerManager.getUUID(args[0]);
 		if (imprisonedID == null) {
 			sender.sendMessage(ChatColor.RED + "That player does not exist");
 			return true;
@@ -37,6 +38,7 @@ public class FreeAny extends PlayerCommand {
 		}
 		pearl = manager.getByImprisoned(imprisonedID);
 		manager.freePearl(pearl, "Freed by admin");
+		sender.sendMessage(ChatColor.GREEN + "The player was freed.");
 		return true;
 	}
 

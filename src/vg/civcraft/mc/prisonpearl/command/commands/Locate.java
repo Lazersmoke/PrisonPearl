@@ -41,6 +41,8 @@ public class Locate extends PlayerCommand{
 		}
 		PrisonPearl pearl = manager.getByImprisoned(p);
 		broad.broadcast(pearl.getImprisonedId());
+		if (!pearl.verifyLocation())
+			manager.freePearl(pearl, String.format("Prison Pearl %s could not authenticate.", pearl.getImprisonedId().toString()));
 		p.sendMessage(ChatColor.YELLOW + "Your pearl is " + pearl.describeLocation());
 		return true;
 	}

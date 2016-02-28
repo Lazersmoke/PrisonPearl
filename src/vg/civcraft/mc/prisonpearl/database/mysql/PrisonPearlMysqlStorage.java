@@ -107,8 +107,9 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 
 	@Override
 	public void addPearl(PrisonPearl pp) {
-		if (isImprisoned(pp.getImprisonedId())) 
-			return;
+		if (isImprisoned(pp.getImprisonedId())) {
+			pearls.put(pp.getImprisonedId(), pp);
+		}
 		handle.refreshAndReconnect();
 		PreparedStatement addPearl = db.prepareStatement(this.addPearl);
 		try {
@@ -134,6 +135,8 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	public void removePearl(PrisonPearl pp, String reason) {
 		handle.refreshAndReconnect();
 		PrisonPearlPlugin.log(reason);
+		if (pp == null)
+			return;
 		pearls.remove(pp.getImprisonedId());
 		PreparedStatement removePearl = db.prepareStatement(this.removePearl);
 		try {
@@ -602,10 +605,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
     	int id = Integer.parseInt(lore.get(2).split(" ")[1]);
     	boolean isValid = uuid.equals(pp.getImprisonedId().toString()) && id == pp.getUniqueIdentifier();
 		if (!isValid) {
-			for (Enchantment en: stack.getItemMeta().getEnchants().keySet())
-				stack.removeEnchantment(en);
-			stack.getItemMeta().getLore().clear();
-			stack.getItemMeta().setDisplayName(null);
+			stack.setItemMeta(null);
 			pp = null;
 		}
     	return pp;
