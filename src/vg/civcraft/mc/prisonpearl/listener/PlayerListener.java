@@ -64,6 +64,7 @@ import vg.civcraft.mc.prisonpearl.managers.BanManager;
 import vg.civcraft.mc.prisonpearl.managers.CombatTagManager;
 import vg.civcraft.mc.prisonpearl.managers.DamageLogManager;
 import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
+import vg.civcraft.mc.prisonpearl.managers.NameLayerManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 import vg.civcraft.mc.prisonpearl.managers.WorldBorderManager;
@@ -172,7 +173,7 @@ public class PlayerListener implements Listener {
 		if (combatManager.isCombatTagNPC(event.getEntity()))  {
 			playerName = player.getName();
 			// UUID being passed isn't the right one.
-			uuid = NameAPI.getUUID(playerName);
+			uuid = NameLayerManager.getUUID(playerName);
 			//String realName = combatTagManager.getNPCPlayerName(player);
 			PrisonPearlPlugin.log("NPC Player: "+playerName+", ID: "+ uuid);
 //			if (!realName.equals("")) {

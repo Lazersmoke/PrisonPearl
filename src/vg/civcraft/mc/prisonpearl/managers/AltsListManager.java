@@ -48,9 +48,8 @@ public class AltsListManager implements Listener {
 	}
 	
 	public List<UUID> getAlts(UUID uuid) {
-		List<UUID> list = new ArrayList<UUID>();
-		list.addAll(Arrays.asList(getAltsArray(uuid)));
-		return list;
+		// This method needs to stay like this.  Time bomb otherwise when AltsListner requests alts.
+		return altsHash.get(uuid);
 	}
 
 	public UUID[] getAltsArray(UUID uuid) {
@@ -76,7 +75,7 @@ public class AltsListManager implements Listener {
 		return altsHash.keySet();
 	}
 	
-	public void addAltsHash(UUID uuid, List<UUID> list) {
+	public synchronized void addAltsHash(UUID uuid, List<UUID> list) {
 		altsHash.put(uuid, list);
 	}
 }
