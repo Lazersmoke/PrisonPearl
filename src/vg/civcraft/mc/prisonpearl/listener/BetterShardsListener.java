@@ -34,7 +34,8 @@ public class BetterShardsListener implements Listener{
 		UUID uuid = event.getPlayerUUID();
 		PlayerChangeServerReason reason = event.getReason();
 		if ((reason == PlayerChangeServerReason.RANDOMSPAWN || 
-				reason == PlayerChangeServerReason.PORTAL)
+				reason == PlayerChangeServerReason.PORTAL || 
+				reason == PlayerChangeServerReason.BED)
 				&& pearls.isImprisoned(uuid))
 			event.setCancelled(true);
 	}
