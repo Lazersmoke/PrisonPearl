@@ -81,12 +81,15 @@ public class MercuryListener implements Listener{
 		loc = new FakeLocation(message[3], Double.parseDouble(message[4]), Double.parseDouble(message[5]),
 				Double.parseDouble(message[6]), server, name);
 		int unique = Integer.parseInt(message[7]);
-		String motd = message[8];
+		String motd = null;
+		if (message.length == 10)
+			motd = message[9];
 		
 		if (type.equals(PrisonPearlEvent.Type.NEW)) {
 			PrisonPearl pp = new PrisonPearl(name, id, loc, unique);
 			pp.setMotd(motd);
 			pp.setHolder(loc);
+			pp.markMove();
 			pearls.addPearl(pp);
 			// We are also going to check if the player is here, if they are kill them.
 			Player p;
@@ -100,6 +103,7 @@ public class MercuryListener implements Listener{
 				type.equals(PrisonPearlEvent.Type.HELD)) {
 			PrisonPearl pp = pearls.getByImprisoned(id);
 			pp.setHolder(loc);
+			pp.markMove();
 		}
 		else if (type.equals(PrisonPearlEvent.Type.FREED)) {
 			PrisonPearl pp = pearls.getByImprisoned(id);
@@ -123,6 +127,7 @@ public class MercuryListener implements Listener{
 				Double.parseDouble(message[5]), server, message[6]);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
 		pp.setHolder(loc);
+		pp.markMove();
 	}
 	
 	private void prisonPearlSummon(String[] message, String server) {
@@ -201,7 +206,6 @@ public class MercuryListener implements Listener{
 		}
 		else if (type.equals("send")) {
 			PrisonPearl pp = pearls.getByImprisoned(UUID.fromString(parts[2]));
-			pp.verifyLocation(); // Verify that the pearl is where we think it is.
 			for (int x = 3; x < parts.length; x++) {
 				Player p = Bukkit.getPlayer(UUID.fromString(parts[x]));
 				if (p == null)

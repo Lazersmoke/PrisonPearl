@@ -606,7 +606,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
     	if (pp == null)
     		return null;
     	int id = Integer.parseInt(lore.get(2).split(" ")[1]);
-    	boolean isValid = uuid.equals(pp.getImprisonedId().toString()) && id == pp.getUniqueIdentifier();
+    	boolean isValid = uuid.equals(pp.getImprisonedId()) && id == pp.getUniqueIdentifier();
 		if (!isValid) {
 			stack.setItemMeta(null);
 			pp = null;

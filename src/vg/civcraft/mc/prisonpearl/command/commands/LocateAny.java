@@ -27,6 +27,7 @@ public class LocateAny extends PlayerCommand {
 		UUID imprisonedID = NameAPI.getUUID(args[0]);
 		if (imprisonedID == null) {
 			sender.sendMessage(ChatColor.RED + "This player doesn't exist");
+			return true;
 		}
 		if (!manager.isImprisoned(imprisonedID)) {
 			sender.sendMessage(ChatColor.RED + "This player is not imprisoned");
