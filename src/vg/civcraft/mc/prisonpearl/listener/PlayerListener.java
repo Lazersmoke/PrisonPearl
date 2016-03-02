@@ -112,7 +112,7 @@ public class PlayerListener implements Listener {
 			return;
 
 		PrisonPearl pp = pearls.getByImprisoned(player);
-		boolean shouldTP = respawnPlayerCorrectly(player, pp);
+		boolean shouldTP = respawnPlayerCorrectly(player);
 		if (shouldTP && pp == null) {
 			player.sendMessage("While away, you were freed!");
 		} else if (pp != null) {

@@ -31,26 +31,26 @@ public class PrisonPearlUtil {
 		summon = PrisonPearlPlugin.getSummonManager();
 	}
 	
-	public static boolean respawnPlayerCorrectly(Player p) {
-		return respawnPlayerCorrectly(p, null);
-	}
-	
 	/**
 	 * 
 	 * @param p
 	 * @param pp
 	 * @return Return false if the player was not tpped in anyway.
 	 */
-	public static boolean respawnPlayerCorrectly(Player p, PrisonPearl pp) {
+	public static boolean respawnPlayerCorrectly(Player p) {
 		// We want this method to deal with all cases: Respawn on death, Respawn on summoning, returning,
 		// different shards transport, everything. 
 		
 		UUID uuid = p.getUniqueId();
 		boolean freeToPearl = PrisonPearlConfig.shouldTpPearlOnFree();
+		PrisonPearl pp = manager.getByImprisoned(uuid);
 		if (PrisonPearlPlugin.isBetterShardsEnabled() && PrisonPearlPlugin.isMercuryEnabled()) {
 			if (manager.isImprisoned(uuid)) {
 				String server = MercuryAPI.serverName();
 				String toServer = manager.getImprisonServer();
+				// This check is incase the player is being summoned;
+				if (summon.isSummoned(p) && summon.getSummon(p).isJustCreated())
+					toServer = ((FakeLocation) pp.getLocation()).getServerName();
 				if (!server.equals(toServer)) {
 					try {
 						FakeLocation loc = null;

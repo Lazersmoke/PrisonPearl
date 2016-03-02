@@ -49,7 +49,8 @@ public class BanListener implements Listener{
 		}
 		sb.append(" UUID KICK_BANNED");
 		PrisonPearlPlugin.log(sb.toString());
-		event.disallow(
-			AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ban.getBanMessage());
+		if (!PrisonPearlPlugin.isCBanManagementEnabled())
+			event.disallow(
+					AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ban.getBanMessage());
 	}
 }

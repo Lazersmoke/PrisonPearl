@@ -110,6 +110,8 @@ public class MercuryListener implements Listener{
 			pearls.freePearlFromMercury(pp, "This pearl was freed on another server. Removing instance.", server);
 			BroadcastManager broad = PrisonPearlPlugin.getBroadcastManager();
 			List<UUID> uuids = broad.getAllBroadcasters(id);
+			if (uuids == null)
+				return;
 			for (UUID receiever: uuids) {
 				Player p;
 				if ((p = Bukkit.getPlayer(receiever)) == null)

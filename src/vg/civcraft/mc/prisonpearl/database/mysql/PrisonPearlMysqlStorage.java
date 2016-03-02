@@ -328,6 +328,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 			int retval = HolderStateToInventory(pp, inv);
 			Location loc = pp.getLocation();
 			if (loc instanceof FakeLocation) { // Not on server
+				log+="\n" + pp.getImprisonedName() + " was skipped feeding because he is not on the current server.";
 				continue; // Other server will handle feeding
 			}
 			if (!upgradePearl(inv[0], pp) && inv[1] != null) {

@@ -415,6 +415,6 @@ public class PrisonPearlManager {
 	}
 	
 	public void feedPearls() {
-		storage.feedPearls(this);
+		PrisonPearlPlugin.log(storage.feedPearls(this));
 	}
 }
