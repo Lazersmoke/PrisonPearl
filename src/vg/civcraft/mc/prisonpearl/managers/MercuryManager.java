@@ -47,10 +47,6 @@ public class MercuryManager {
     		if (loc instanceof FakeLocation)
     			continue; // If it isn't your pearl don't worry about it.  The server that has it will send the messages.
     		
-    		long lastMovedRelative = ((System.currentTimeMillis() - pp.getLastMoved()) / 1000) * 20;
-    		// Convert to seconds and then convert to ticks.
-    		if (lastMovedRelative > PrisonPearlConfig.getMercuryUpdateMessageTicks())
-    			continue;
     		String playerName = null;
     		if (pp.getHolderPlayer() != null)
     			playerName = pp.getHolderPlayer().getDisplayName();

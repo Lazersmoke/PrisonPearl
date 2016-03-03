@@ -627,7 +627,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		Random rand = new Random();
 		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner, rand.nextInt(1000000000));
 		addPearl(pp);
-		pp.setHolder(imprisoner.getLocation()); // This will set the holder to something valid so it can correctly send it out.
+		pp.setHolder(imprisoner); // This will set the holder to something valid so it can correctly send it out.
 		pp.markMove();
 		return pp;
 	}

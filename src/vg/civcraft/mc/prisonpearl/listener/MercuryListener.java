@@ -108,6 +108,8 @@ public class MercuryListener implements Listener{
 		}
 		else if (type.equals(PrisonPearlEvent.Type.FREED)) {
 			PrisonPearl pp = pearls.getByImprisoned(id);
+			if (pp == null)
+				return;
 			pearls.freePearlFromMercury(pp, "This pearl was freed on another server. Removing instance.", server);
 			BroadcastManager broad = PrisonPearlPlugin.getBroadcastManager();
 			List<UUID> uuids = broad.getAllBroadcasters(id);
@@ -126,8 +128,11 @@ public class MercuryListener implements Listener{
 	private void prisonPearlMove(String[] message, String server) {
 		UUID uuid = UUID.fromString(message[1]);
 		String world = message[2];
+		String player = message[6];
+		if (player.equals("null"))
+			player = null;
 		FakeLocation loc = new FakeLocation(world, Double.parseDouble(message[3]), Double.parseDouble(message[4]),
-				Double.parseDouble(message[5]), server, message[6]);
+				Double.parseDouble(message[5]), server, null);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
 		pp.setHolder(loc);
 		pp.markMove();
@@ -165,7 +170,8 @@ public class MercuryListener implements Listener{
 			// Job of the shard holding the player in the prison world to add to mysql.
 			sm.summonPlayer(pearls.getByImprisoned(p));
 			try {
-				BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
+				if (BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN))
+					MercuryManager.acceptPPSummon(uuid, p.getLocation());
 			} catch (PlayerStillDeadException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
