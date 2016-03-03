@@ -440,6 +440,10 @@ public class PrisonPearl {
         this.lastMoved = System.currentTimeMillis();
     }
     
+    public long getLastMoved() {
+    	return this.lastMoved;
+    }
+    
     // ignoreList is a Set of lower-case player names to not send messages to
     public static Set<String> sendProximityMessage(
             final Location location, final Double distance, final String message, final Set<String> ignoreList) {
