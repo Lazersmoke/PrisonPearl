@@ -59,7 +59,8 @@ public class MercuryListener implements Listener{
 			prisonPearlSummon(parts, event.getOriginServer());
 		else if("broadcast".equals(parts[0]))
 			prisonPearlBroadcast(parts, event.getOriginServer());
-			
+		else if("locate".equals(parts[0]))
+			prisonPearlLocate(parts, event.getOriginServer());
 	}
 	
 	private void pearlTransfer(String[] message){
@@ -215,6 +216,10 @@ public class MercuryListener implements Listener{
 				bm.broadcastMessage(p, pp);
 			}
 		}
+	}
+	
+	private void prisonPearlLocate(String[] parts, String originServer) {
+		// Going to lower the timer for pearl updates. We can maybe add this later no need right now.
 	}
 
 }

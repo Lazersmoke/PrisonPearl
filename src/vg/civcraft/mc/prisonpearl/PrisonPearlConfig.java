@@ -178,4 +178,9 @@ public class PrisonPearlConfig {
 	public static int getPrisonUnloadTimerTicks() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("prison.unloadTimerTicks").getInt();
 	}
+	
+	@CivConfig(name = "mercury.pearlupdateticks", def = "20", type = CivConfigType.Int)
+	public static int getMercuryUpdateMessageTicks() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("mercury.pearlupdateticks").getInt();
+	}
 }

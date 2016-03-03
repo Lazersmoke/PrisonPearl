@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
 import vg.civcraft.mc.prisonpearl.events.PrisonPearlEvent;
@@ -33,7 +34,7 @@ public class MercuryManager {
 				updateAllPearlLocations();
 			}
 			
-		}, 1200, 1200);
+		}, 20, PrisonPearlConfig.getMercuryUpdateMessageTicks());
 	}
 	
 	private static void updateAllPearlLocations(){
@@ -159,12 +160,28 @@ public class MercuryManager {
 	public static boolean isPlayerOnline(String name) {
 		if (!isMercuryEnabled)
 			for (Player p: Bukkit.getOnlinePlayers())
-				if (p.getName().equals(name))
+				if (p.getName().equalsIgnoreCase(name))
 					return true;
 		else
 			for (String x: MercuryAPI.getAllPlayers())
 				if (x.equalsIgnoreCase(name))
 					return true;
 		return false;
+	}
+	
+	public static void requestPPLocate(PrisonPearl pp) {
+		if (!isMercuryEnabled)
+			return;
+		String message = "locate|request|" + pp.getImprisonedId().toString();
+		MercuryAPI.sendGlobalMessage(message, channel);
+	}
+	
+	public static void sendPPLocate(PrisonPearl pp) {
+		if (!isMercuryEnabled)
+			return;
+		Location loc = pp.getLocation();
+		String message = String.format("locate|send|%s|%d|%d|%d", loc.getWorld().getName(),
+				loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 }
