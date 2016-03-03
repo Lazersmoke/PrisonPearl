@@ -51,7 +51,7 @@ public class MercuryManager {
     		if (pp.getHolderPlayer() != null)
     			playerName = pp.getHolderPlayer().getDisplayName();
     		String message = "move|" + pp.getImprisonedId().toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + 
-    			loc.getBlockY() + "|" + loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName;
+    			loc.getBlockY() + "|" + loc.getBlockZ() + "|" + playerName;
     		MercuryAPI.sendGlobalMessage(message, channel);
     	}
     }
