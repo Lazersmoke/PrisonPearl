@@ -604,8 +604,10 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
     		return null;
     	UUID uuid = UUID.fromString(lore.get(1).split(" ")[1]);
     	PrisonPearl pp = getByImprisoned(uuid);
-    	if (pp == null)
+    	if (pp == null){
+    		stack.setItemMeta(null);
     		return null;
+    	}
     	int id = Integer.parseInt(lore.get(2).split(" ")[1]);
     	boolean isValid = uuid.equals(pp.getImprisonedId()) && id == pp.getUniqueIdentifier();
 		if (!isValid) {
@@ -625,6 +627,8 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		Random rand = new Random();
 		PrisonPearl pp = new PrisonPearl(imprisonedName, imprisonedId, imprisoner, rand.nextInt(1000000000));
 		addPearl(pp);
+		pp.setHolder(imprisoner.getLocation()); // This will set the holder to something valid so it can correctly send it out.
+		pp.markMove();
 		return pp;
 	}
 
