@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
 import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
+import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.mercury.events.AsyncPluginBroadcastMessageEvent;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
@@ -170,8 +171,13 @@ public class MercuryListener implements Listener{
 			// Job of the shard holding the player in the prison world to add to mysql.
 			sm.summonPlayer(pearls.getByImprisoned(p));
 			try {
-				if (BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN))
+				PrisonPearl pp = pearls.getByImprisoned(uuid);
+				if (BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN)) {
+					FakeLocation loc = (FakeLocation) pp.getLocation();
+					TeleportInfo info = new TeleportInfo(loc.getWorldName(), toServer, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+					BetterShardsAPI.teleportPlayer(toServer, uuid, info);
 					MercuryManager.acceptPPSummon(uuid, p.getLocation());
+				}
 			} catch (PlayerStillDeadException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
