@@ -40,7 +40,7 @@ public class SummonCommand extends PlayerCommand{
 			return true;
 		}
 		if (summon.isSummoned(pearl)) {
-			p.sendMessage(ChatColor.RED + "That player is already imprisoned.");
+			p.sendMessage(ChatColor.RED + "That player is already summoned.");
 			return true;
 		}
 		if (!summon.summonPlayer(pearl)) {

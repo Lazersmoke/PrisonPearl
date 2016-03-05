@@ -28,13 +28,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -59,6 +62,7 @@ import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.PrisonPearlUtil;
+import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.events.PrisonPearlEvent;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 import vg.civcraft.mc.prisonpearl.managers.CombatTagManager;
@@ -694,5 +698,52 @@ public class PlayerListener implements Listener {
 		// set off an event
 		pearls.freePearl(pp, reason);
 		return true;
+	}
+	
+    @EventHandler(priority=EventPriority.NORMAL)
+    private boolean onPlayerChatEvent(AsyncPlayerChatEvent event) {
+        if (summon.isSummoned(event.getPlayer()) && !summon.getSummon(event.getPlayer()).getCanSpeak()) {
+           event.setCancelled(true);
+        }
+
+        return true;
+    }
+
+    @EventHandler(priority=EventPriority.NORMAL)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player)event.getDamager();
+
+        if(summon.isSummoned(player) && !summon.getSummon(player).getCanDamage()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority=EventPriority.NORMAL)
+    public void onBlockBreakEvent(BlockBreakEvent event) {
+
+        Player player = event.getPlayer();
+
+        if(summon.isSummoned(player) && !summon.getSummon(player).getCanBreak()) {
+            event.setCancelled(true);
+        }
+    }
+    
+    @EventHandler(priority=EventPriority.HIGHEST)
+	public void onSummonDeath(EntityDeathEvent event) {
+		if (!(event.getEntity() instanceof Player))
+			return;
+
+		Player player = (Player)event.getEntity();
+		if (!pearls.isImprisoned(player))
+			return;
+		
+		PrisonPearl pp = pearls.getByImprisoned(player);
+		if (summon.isSummoned(player))
+			summon.returnPlayer(pp);
 	}
 }
