@@ -62,7 +62,8 @@ public class SummonManager {
 			}
 		} else if (pearled != null) {
 			Summon s = new Summon(pearl.getImprisonedId(), pearled.getLocation(), pearl);
-			addSummonPlayer(s); // We need to add the summon now so that respwan method can find the Summon Object.
+			addSummonPlayer(s); // We need to add the summon now so that respawn method can find the Summon Object.
+			// Fucking turtles right.
 			s.setJustCreated(true);
 			PrisonPearlUtil.respawnPlayerCorrectly(pearled);
 			s.setJustCreated(false);

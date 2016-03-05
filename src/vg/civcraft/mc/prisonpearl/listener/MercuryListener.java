@@ -178,6 +178,10 @@ public class MercuryListener implements Listener{
 					BetterShardsAPI.teleportPlayer(toServer, uuid, info);
 					MercuryManager.acceptPPSummon(uuid, p.getLocation());
 				}
+				else {
+					String returnMessage = "The player could not be summoned.";
+					MercuryManager.denyPPSummon(uuid, returnMessage);
+				}
 			} catch (PlayerStillDeadException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

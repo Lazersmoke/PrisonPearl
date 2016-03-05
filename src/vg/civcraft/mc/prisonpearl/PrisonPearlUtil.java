@@ -49,7 +49,8 @@ public class PrisonPearlUtil {
 				String server = MercuryAPI.serverName();
 				String toServer = manager.getImprisonServer();
 				// This check is incase the player is being summoned;
-				if (summon.isSummoned(p) && summon.getSummon(p).isJustCreated() && !toServer.equals(server))
+				if (summon.isSummoned(p) && (summon.getSummon(p).isToBeReturned() ||summon.getSummon(p).isJustCreated())
+						&& toServer.equals(server))
 					toServer = ((FakeLocation) pp.getLocation()).getServerName();
 				if (!server.equals(toServer)) {
 					try {
