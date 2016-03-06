@@ -174,17 +174,7 @@ public class PlayerListener implements Listener {
 		UUID uuid = player.getUniqueId();
 		String playerName = player.getName();
 		
-		if (combatManager.isCombatTagNPC(event.getEntity()))  {
-			playerName = player.getName();
-			// UUID being passed isn't the right one.
-			uuid = NameLayerManager.getUUID(playerName);
-			//String realName = combatTagManager.getNPCPlayerName(player);
-			PrisonPearlPlugin.log("NPC Player: "+playerName+", ID: "+ uuid);
-//			if (!realName.equals("")) {
-//				playerName = realName;
-//			}
-		}
-		else if (combatManager.isCombatTagPlusNPC(player)){
+		if (combatManager.isCombatTagPlusNPC(player)){
 			NpcIdentity iden = combatManager.getCombatTagPlusNPCIdentity(player);
 			uuid = iden.getId();
 			playerName = iden.getName();
