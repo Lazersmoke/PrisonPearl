@@ -110,6 +110,7 @@ public class PlayerListener implements Listener {
 			if (pp == null)
 				continue;
 			pp.setHolder(player);
+			pp.markMove();
 		}
 		
 		if (player.isDead())

@@ -50,8 +50,10 @@ public class PrisonPearlUtil {
 				String toServer = manager.getImprisonServer();
 				// This check is incase the player is being summoned;
 				if (summon.isSummoned(p) && (summon.getSummon(p).isToBeReturned() ||summon.getSummon(p).isJustCreated())
-						&& toServer.equals(server))
-					toServer = ((FakeLocation) pp.getLocation()).getServerName();
+						&& toServer.equals(server)) {
+					if (pp.getLocation() instanceof FakeLocation)
+						toServer = ((FakeLocation) pp.getLocation()).getServerName();
+				}
 				if (!server.equals(toServer)) {
 					try {
 						FakeLocation loc = null;

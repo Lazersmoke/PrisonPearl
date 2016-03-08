@@ -44,6 +44,7 @@ public class MercuryManager {
     	for (PrisonPearl pp: pearls){
     		Location loc = pp.getLocation();
     		
+    		//System.out.println(pp.getImprisonedName() + " loc at " + loc.getClass().getName());
     		if (loc instanceof FakeLocation)
     			continue; // If it isn't your pearl don't worry about it.  The server that has it will send the messages.
     		

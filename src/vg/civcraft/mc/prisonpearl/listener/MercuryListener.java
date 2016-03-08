@@ -168,23 +168,18 @@ public class MercuryListener implements Listener{
 				MercuryManager.denyPPSummon(uuid, returnMessage);
 				return;
 			}
+			
+			PrisonPearl pp = pearls.getByImprisoned(uuid);
 			// Job of the shard holding the player in the prison world to add to mysql.
-			sm.summonPlayer(pearls.getByImprisoned(p));
-			try {
-				PrisonPearl pp = pearls.getByImprisoned(uuid);
-				if (BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN)) {
-					FakeLocation loc = (FakeLocation) pp.getLocation();
-					TeleportInfo info = new TeleportInfo(loc.getWorldName(), toServer, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-					BetterShardsAPI.teleportPlayer(toServer, uuid, info);
-					MercuryManager.acceptPPSummon(uuid, p.getLocation());
-				}
-				else {
-					String returnMessage = "The player could not be summoned.";
-					MercuryManager.denyPPSummon(uuid, returnMessage);
-				}
-			} catch (PlayerStillDeadException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (sm.summonPlayer(pearls.getByImprisoned(p))) {
+				FakeLocation loc = (FakeLocation) pp.getLocation();
+				TeleportInfo info = new TeleportInfo(loc.getWorldName(), toServer, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+				BetterShardsAPI.teleportPlayer(toServer, uuid, info);
+				MercuryManager.acceptPPSummon(uuid, p.getLocation());
+			}
+			else {
+				String returnMessage = "The player could not be summoned.";
+				MercuryManager.denyPPSummon(uuid, returnMessage);
 			}
 		}
 		else if (reason.equals("deny")) {
