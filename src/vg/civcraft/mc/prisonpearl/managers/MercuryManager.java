@@ -3,6 +3,7 @@ package vg.civcraft.mc.prisonpearl.managers;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,13 +45,14 @@ public class MercuryManager {
     	for (PrisonPearl pp: pearls){
     		Location loc = pp.getLocation();
     		
-    		//System.out.println(pp.getImprisonedName() + " loc at " + loc.getClass().getName());
     		if (loc instanceof FakeLocation)
     			continue; // If it isn't your pearl don't worry about it.  The server that has it will send the messages.
     		
+    		
     		String playerName = null;
-    		if (pp.getHolderPlayer() != null)
-    			playerName = pp.getHolderPlayer().getDisplayName();
+    		
+    		playerName = pp.getHolderName();
+    		
     		String message = "move|" + pp.getImprisonedId().toString() + "|" + loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + 
     			loc.getBlockY() + "|" + loc.getBlockZ() + "|" + playerName;
     		MercuryAPI.sendGlobalMessage(message, channel);

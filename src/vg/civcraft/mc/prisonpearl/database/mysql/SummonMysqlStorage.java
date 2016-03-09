@@ -237,7 +237,7 @@ public class SummonMysqlStorage implements ISummonStorage{
 				boolean canSpeak = set.getBoolean("canSpeak");
 				boolean canDamage = set.getBoolean("canDamage");
 				boolean canBreak = set.getBoolean("canBreak");
-				summon = new Summon(uuid, loc, PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(uuid));
+				summon = new Summon(uuid, loc, null);
 				summon.setMaxDistance(dist);
 				summon.setAmountDamage(damage);
 				summon.setCanSpeak(canSpeak);

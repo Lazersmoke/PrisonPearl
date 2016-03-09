@@ -128,6 +128,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 			addPearl.setInt(7, pp.getUniqueIdentifier());
 			addPearl.setString(8, pp.getMotd());
 			addPearl.execute();
+			pearls.put(pp.getImprisonedId(), pp);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

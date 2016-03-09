@@ -21,12 +21,21 @@ public class Summon {
 	private boolean toBeReturned = false; // This is mainly so PlayerRespawn method knows if it is trying to respawn the player.
 	private boolean justCreated = false; // This is mainly so PlayerRespawn method knows if it is trying to be sent to summoned player.
 	
-	public Summon(UUID uuid, Location returnLoc, PrisonPearl pp) {
+	public Summon(final UUID uuid, Location returnLoc, PrisonPearl prison) {
 		this.uuid = uuid;
 		this.returnLoc = returnLoc;
-		this.pp = pp;
+		this.pp = prison;
 		distance = PrisonPearlConfig.getSummonDamageRadius();
 		amountDamage = PrisonPearlConfig.getSummonDamageAmount();
+		if (pp == null)
+			Bukkit.getScheduler().runTaskLater(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+				@Override
+				public void run() {
+					pp = PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(uuid);
+				}
+				
+			}, 1);
 	}
 	
 	public Location getReturnLocation() {

@@ -133,7 +133,7 @@ public class MercuryListener implements Listener{
 		if (player.equals("null"))
 			player = null;
 		FakeLocation loc = new FakeLocation(world, Double.parseDouble(message[3]), Double.parseDouble(message[4]),
-				Double.parseDouble(message[5]), server, null);
+				Double.parseDouble(message[5]), server, player);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
 		pp.setHolder(loc);
 		pp.markMove();
