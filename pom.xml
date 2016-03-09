@@ -56,12 +56,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.trc202</groupId>
-			<artifactId>Combattag</artifactId>
-			<version>1.8.3</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>net.minelink</groupId>
 			<artifactId>CombatTagPlus</artifactId>
 			<version>[1.2.0,)</version>
