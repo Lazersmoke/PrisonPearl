@@ -177,10 +177,6 @@ public class MercuryListener implements Listener{
 				BetterShardsAPI.teleportPlayer(toServer, uuid, info);
 				MercuryManager.acceptPPSummon(uuid, p.getLocation());
 			}
-			else {
-				String returnMessage = "The player could not be summoned.";
-				MercuryManager.denyPPSummon(uuid, returnMessage);
-			}
 		}
 		else if (reason.equals("deny")) {
 			PrisonPearl pp = pearls.getByImprisoned(uuid);
