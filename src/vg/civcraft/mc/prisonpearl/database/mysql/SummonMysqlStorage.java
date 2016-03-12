@@ -104,6 +104,7 @@ public class SummonMysqlStorage implements ISummonStorage{
 	@Override
 	public void removeSummon(UUID uuid) {
 		handle.refreshAndReconnect();
+		summons.remove(uuid);
 		PreparedStatement removeSummonedPlayer = db.prepareStatement(this.removeSummonedPlayer);
 		try {
 			removeSummonedPlayer.setString(1, uuid.toString());
