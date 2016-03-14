@@ -54,6 +54,17 @@ public class PrisonPortaledPlayerListener implements Listener{
 			manager.removePlayerPortaled(player.getUniqueId());
 		}
 	}
+
+	/* Need to figure this out later.
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		// We are listening here if we should kill the player or not.
+		Player p = event.getPlayer();
+		Location toLoc = p.getLocation();
+		if (toLoc.getWorld() == pearls.getImprisonWorld() && !manager.isPlayerPortaledToPrison(p))
+			p.setHealth(0.0);
+	}
+	*/
 	
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPrisonPearlEvent(PrisonPearlEvent event) {

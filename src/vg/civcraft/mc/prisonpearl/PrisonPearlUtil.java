@@ -110,11 +110,9 @@ public class PrisonPearlUtil {
 					return true;
 				}
 			}
-			else if (pp != null) {
-				p.teleport(freeToPearl ? pp.getLocation() : new Location(null, 0, 0, 0));
-				return true;
-			}
 			else {
+				if (pp == null) // Don't bother with any of this if there isn't a pearl.
+					return true;
 				try {
 					// For when a player is freed.
 					if (freeToPearl && pp.getLocation() instanceof FakeLocation) { // Player was just freed and should be returned to his holder.
