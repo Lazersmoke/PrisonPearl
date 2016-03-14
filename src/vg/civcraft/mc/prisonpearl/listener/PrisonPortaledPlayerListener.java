@@ -8,7 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
@@ -30,19 +32,17 @@ public class PrisonPortaledPlayerListener implements Listener{
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
-		if (pearls.isImprisoned(player.getUniqueId()))
+		if (pearls.isImprisoned(player))
 			return;
-		
-		if (event.getRespawnLocation().getWorld() != pearls.getImprisonWorld()) {
+		else if (!pearls.isImprisoned(player) && manager.isPlayerPortaledToPrison(player)) {
 			manager.removePlayerPortaled(player.getUniqueId());
-			
 		}
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerPortalEvent(PlayerPortalEvent event) {
 		Player player = event.getPlayer();
-		if (pearls.isImprisoned(player.getUniqueId()))
+		if (!pearls.isImprisoned(player.getUniqueId()))
 			return;
 		Location toLoc = event.getTo();
 		if (toLoc == null) {
@@ -54,23 +54,48 @@ public class PrisonPortaledPlayerListener implements Listener{
 			manager.removePlayerPortaled(player.getUniqueId());
 		}
 	}
-
-	/* Need to figure this out later.
+	
 	@EventHandler(priority=EventPriority.MONITOR)
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		// We are listening here if we should kill the player or not.
+	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		Location toLoc = p.getLocation();
-		if (toLoc.getWorld() == pearls.getImprisonWorld() && !manager.isPlayerPortaledToPrison(p))
-			p.setHealth(0.0);
+		if (toLoc == null || toLoc.getWorld() != pearls.getImprisonWorld()) {
+			return;
+		}
+		
+		if (!pearls.isImprisoned(p) && manager.isPlayerPortaledToPrison(p)) {
+			p.setHealth(0.0); // Need to kill the player;
+			manager.removePlayerPortaled(p.getUniqueId());
+			return;
+		}
+		else if (pearls.isImprisoned(p)) {
+			manager.addPlayerPortaled(p.getUniqueId());
+		}
 	}
-	*/
+	
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		Player p = event.getPlayer();
+		Location toLoc = p.getLocation();
+		if (toLoc == null || toLoc.getWorld() != pearls.getImprisonWorld()) {
+			return;
+		}
+		
+		if (!pearls.isImprisoned(p) && manager.isPlayerPortaledToPrison(p)) {
+			// Don't need to kill the player here because if he/she was freed
+			// then they were already handled elsewhere.
+			manager.removePlayerPortaled(p.getUniqueId());
+		}
+		else if (pearls.isImprisoned(p)) {
+			manager.addPlayerPortaled(p.getUniqueId());
+		}
+	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPrisonPearlEvent(PrisonPearlEvent event) {
 		if (event.getType() == PrisonPearlEvent.Type.NEW) {
 			UUID uuid = event.getPrisonPearl().getImprisonedId();
-			manager.removePlayerPortaled(uuid);
+			manager.addPlayerPortaled(uuid);
 		}
 	}
 }
