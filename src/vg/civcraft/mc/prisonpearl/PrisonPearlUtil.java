@@ -90,7 +90,9 @@ public class PrisonPearlUtil {
 								return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 							}
 						}
-						return false;
+						
+						BetterShardsAPI.randomSpawnPlayer(toServer, p.getUniqueId());
+						return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 					} catch (PlayerStillDeadException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
