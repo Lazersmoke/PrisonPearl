@@ -405,7 +405,7 @@ public class PrisonPearlManager {
 	public void freePearlFromMercury(PrisonPearl pp, String reason, String server) {
 		storage.removePearl(pp, reason);
 		if (server != null && pp.getImprisonedPlayer() != null) {
-			respawnPlayerCorrectly(pp.getImprisonedPlayer());
+			respawnPlayerCorrectly(pp.getImprisonedPlayer(), pp);
 		}
 	}
 	
