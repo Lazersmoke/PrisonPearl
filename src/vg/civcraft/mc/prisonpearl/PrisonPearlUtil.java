@@ -122,7 +122,7 @@ public class PrisonPearlUtil {
 			}
 			try {
 				if (freeToPearl && passPearl != null && passPearl.getLocation() instanceof FakeLocation) { // Player was just freed and should be returned to his holder.
-					FakeLocation loc = (FakeLocation) pp.getLocation();
+					FakeLocation loc = (FakeLocation) passPearl.getLocation();
 					TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(), 
 							loc.getBlockZ());
 					BetterShardsAPI.teleportPlayer(loc.getServerName(), uuid, info);
