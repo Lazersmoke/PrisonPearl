@@ -238,7 +238,7 @@ public class PrisonPearlManager {
 		if (player != null) {
 			Location currentLoc = player.getLocation();
 			if (!player.isDead() && currentLoc.getWorld() == getImprisonWorld()) {
-				respawnPlayerCorrectly(player);
+				respawnPlayerCorrectly(player, pp);
 			}
 			
 		}

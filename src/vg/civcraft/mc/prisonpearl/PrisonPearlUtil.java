@@ -35,13 +35,18 @@ public class PrisonPearlUtil {
 		summon = PrisonPearlPlugin.getSummonManager();
 	}
 	
+	public static boolean respawnPlayerCorrectly(Player p) {
+		return respawnPlayerCorrectly(p, null);
+	}
+	
 	/**
 	 * 
 	 * @param p
 	 * @param pp
+	 * @param passPearl Will mainly just deal if a player was just freed.
 	 * @return Return false if the player was not tpped in anyway.
 	 */
-	public static boolean respawnPlayerCorrectly(Player p) {
+	public static boolean respawnPlayerCorrectly(Player p, PrisonPearl passPearl) { 
 		// We want this method to deal with all cases: Respawn on death, Respawn on summoning, returning,
 		// different shards transport, everything. 
 		
@@ -85,25 +90,7 @@ public class PrisonPearlUtil {
 								return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 							}
 						}
-						if (freeToPearl && pp.getLocation() instanceof FakeLocation) { // Player was just freed and should be returned to his holder.
-							loc = (FakeLocation) pp.getLocation();
-							TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(), 
-									loc.getBlockZ());
-							BetterShardsAPI.teleportPlayer(loc.getServerName(), uuid, info);
-							return BetterShardsAPI.connectPlayer(p, loc.getServerName(), PlayerChangeServerReason.PLUGIN);
-						}
-						else { // Some other cases.
-							if (BetterShardsAPI.hasBed(uuid)) { // Like if a player has a bed ;)
-								BedLocation bed = BetterShardsAPI.getBedLocation(uuid);
-								BetterShardsAPI.teleportPlayer(bed.getServer(), uuid, bed.getTeleportInfo());
-								return BetterShardsAPI.connectPlayer(p, bed.getServer(), PlayerChangeServerReason.PLUGIN);
-							}
-							// Randomly respawn the player on the server where the pearl was located.
-							Random r = new Random();
-							int num = r.nextInt(MercuryAPI.getAllConnectedServers().size());
-							BetterShardsAPI.randomSpawnPlayer((String) MercuryAPI.getAllConnectedServers().toArray()[num], uuid);
-							return true;
-						}
+						return false;
 					} catch (PlayerStillDeadException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -130,6 +117,30 @@ public class PrisonPearlUtil {
 						p.teleport(manager.getPrisonSpawnLocation());
 					return true;
 				}
+			}
+			try {
+				if (freeToPearl && passPearl != null && passPearl.getLocation() instanceof FakeLocation) { // Player was just freed and should be returned to his holder.
+					FakeLocation loc = (FakeLocation) pp.getLocation();
+					TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(), 
+							loc.getBlockZ());
+					BetterShardsAPI.teleportPlayer(loc.getServerName(), uuid, info);
+					return BetterShardsAPI.connectPlayer(p, loc.getServerName(), PlayerChangeServerReason.PLUGIN);
+				}
+				else if (passPearl != null){ // Some other cases.
+					if (BetterShardsAPI.hasBed(uuid)) { // Like if a player has a bed ;)
+						BedLocation bed = BetterShardsAPI.getBedLocation(uuid);
+						BetterShardsAPI.teleportPlayer(bed.getServer(), uuid, bed.getTeleportInfo());
+						return BetterShardsAPI.connectPlayer(p, bed.getServer(), PlayerChangeServerReason.PLUGIN);
+					}
+					// Randomly respawn the player on the server where the pearl was located.
+					Random r = new Random();
+					int num = r.nextInt(MercuryAPI.getAllConnectedServers().size());
+					BetterShardsAPI.randomSpawnPlayer((String) MercuryAPI.getAllConnectedServers().toArray()[num], uuid);
+					return true;
+				}
+			} catch (PlayerStillDeadException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			return false;
 		}
