@@ -31,6 +31,14 @@ public class MysqlDatabaseHandler implements ISaveLoad, IStorageHandler{
 		plugin = PrisonPearlPlugin.getInstance();
 		initializeDB();
 		initializeStorageManagers();
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+			@Override
+			public void run() {
+				save();
+			}
+			
+		}, 100, PrisonPearlConfig.getPPSaveTicks());
 	}
 	
 	

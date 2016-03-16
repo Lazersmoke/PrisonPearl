@@ -183,4 +183,9 @@ public class PrisonPearlConfig {
 	public static int getMercuryUpdateMessageTicks() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("mercury.pearlupdateticks").getInt();
 	}
+	
+	@CivConfig(name = "ppsaveticks", def = "1200", type = CivConfigType.Int)
+	public static int getPPSaveTicks() {
+		return PrisonPearlPlugin.getInstance().GetConfig().get("ppsaveticks").getInt();
+	}
 }

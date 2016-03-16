@@ -121,6 +121,7 @@ public class SummonManager {
 			if (pp == null) {
 				System.err.println("Somehow " + summon.getUUID() + " was summoned but isn't imprisoned");
 				i.remove();
+				storage.removeSummon(summon.getUUID());
 				continue;
 			}
 

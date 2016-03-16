@@ -61,6 +61,7 @@ public class PrisonPearlPlugin extends ACivMod {
 	
 	public void onDisable() {
 		super.onDisable();
+		dbHandle.getSaveLoadHandler().save();
 	}
 	
 	private void handleManagers() {

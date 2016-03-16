@@ -405,12 +405,7 @@ public class PrisonPearlManager {
 	public void freePearlFromMercury(PrisonPearl pp, String reason, String server) {
 		storage.removePearl(pp, reason);
 		if (server != null && pp.getImprisonedPlayer() != null) {
-			try {
-				BetterShardsAPI.connectPlayer(pp.getImprisonedPlayer(), server, PlayerChangeServerReason.PLUGIN);
-			} catch (PlayerStillDeadException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			respawnPlayerCorrectly(pp.getImprisonedPlayer());
 		}
 	}
 	
