@@ -39,10 +39,10 @@ public class PrisonPearlPlugin extends ACivMod {
 	private static DamageLogManager damageManager;
 	private static MercuryManager mercuryManager;
 	private static NameLayerManager namelayerManager;
+	private static WorldBorderManager worldborderManager;
 	private static PrisonPearlManager pearlManager;
 	private static PrisonPortaledPlayerManager portaledManager;
 	private static SummonManager summonManager;
-	private static WorldBorderManager worldborderManager;
 	
 	public void onEnable() {
 		super.onEnable();
@@ -72,10 +72,10 @@ public class PrisonPearlPlugin extends ACivMod {
 		damageManager = new DamageLogManager();
 		mercuryManager = new MercuryManager();
 		namelayerManager = new NameLayerManager();
+		worldborderManager = new WorldBorderManager();
 		pearlManager = new PrisonPearlManager();
 		portaledManager = new PrisonPortaledPlayerManager();
 		summonManager = new SummonManager();
-		worldborderManager = new WorldBorderManager();
 	}
 	
 	private void handleListeners() {
