@@ -113,7 +113,7 @@ public class PrisonPearlConfig {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("upkeep.resource").getInt();
 	}
 	
-	@CivConfig(name = "upkeep.quanity", def = "4" , type = CivConfigType.Int)
+	@CivConfig(name = "upkeep.quantity", def = "4" , type = CivConfigType.Int)
 	public static int getResourceUpkeepAmount() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("upkeep.quantity").getInt();
 	}
