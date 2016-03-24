@@ -154,6 +154,7 @@ public class SummonMysqlStorage implements ISummonStorage{
 				summon.setCanSpeak(canSpeak);
 				summon.setCanDamage(canDamage);
 				summon.setCanBreak(canBreak);
+				summons.put(uuid, summon);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -211,7 +212,8 @@ public class SummonMysqlStorage implements ISummonStorage{
 
 	@Override
 	public void save() {
-		// Don't need to do anything mysql saves.
+		for (Summon s: summons.values())
+			updateSummon(s);
 	}
 
 	@Override

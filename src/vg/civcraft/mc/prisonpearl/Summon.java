@@ -99,7 +99,7 @@ public class Summon {
 		Location playerLoc = p.getLocation();
 		if (!pearlLoc.getWorld().equals(playerLoc.getWorld()))
 			return true;
-		return pearlLoc.distance(playerLoc) <= distance;
+		return pearlLoc.distance(playerLoc) > distance;
 	}
 	
 	public void setAmountDamage(int amountDamage) {
