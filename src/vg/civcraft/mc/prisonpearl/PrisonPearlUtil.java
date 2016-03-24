@@ -30,9 +30,12 @@ public class PrisonPearlUtil {
 	private static SummonManager summon;
 	private static PrisonPortaledPlayerManager portaled;
 	
+	private static Thread mainThread;
+	
 	public PrisonPearlUtil() {
 		manager = PrisonPearlPlugin.getPrisonPearlManager();
 		summon = PrisonPearlPlugin.getSummonManager();
+		mainThread = Thread.currentThread();
 	}
 	
 	public static boolean respawnPlayerCorrectly(Player p) {
@@ -192,11 +195,11 @@ public class PrisonPearlUtil {
 		if (loc == null) {
 			loc = player.getLocation();
 		}
-		World world = loc.getWorld();
+		final World world = loc.getWorld();
 		Inventory inv = player.getInventory();
 		int end = inv.getSize();
 		for (int i = 0; i < end; ++i) {
-			ItemStack item = inv.getItem(i);
+			final ItemStack item = inv.getItem(i);
 			if (item == null) {
 				continue;
 			}
@@ -205,7 +208,23 @@ public class PrisonPearlUtil {
 				continue;
 			}
 			inv.clear(i);
-			world.dropItemNaturally(loc, item);
+			if (!isMainThread(Thread.currentThread())) {
+				final Location l = loc;
+				Bukkit.getScheduler().runTask(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+					@Override
+					public void run() {
+						world.dropItemNaturally(l, item);
+					}
+					
+				});
+			}
+			else
+				world.dropItemNaturally(loc, item);
 		}
 	}
+    
+    public static boolean isMainThread(Thread t) {
+    	return t.equals(mainThread);
+    }
 }

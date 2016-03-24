@@ -53,7 +53,7 @@ public class SummonManager {
 	 * @param pearl
 	 */
 	public boolean summonPlayer(PrisonPearl pearl) {
-		Player pearled = pearl.getImprisonedPlayer();
+		final Player pearled = pearl.getImprisonedPlayer();
 		if (pearled == null && PrisonPearlPlugin.isMercuryEnabled()) {
 			PlayerDetails details = MercuryAPI.getServerforAccount(pearl.getImprisonedId());
 			if (details != null) {
@@ -67,6 +67,7 @@ public class SummonManager {
 			s.setJustCreated(true);
 			PrisonPearlUtil.respawnPlayerCorrectly(pearled);
 			s.setJustCreated(false);
+			return true;
 		}
 		return false;
 	}

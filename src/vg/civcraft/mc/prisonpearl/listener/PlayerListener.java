@@ -102,15 +102,24 @@ public class PlayerListener implements Listener {
 		ban.checkBan(player.getUniqueId());
 		UUID uuid = player.getUniqueId();
 
-		// Incase a player comes from another server and has a pearl.
+		// In case a player comes from another server and has a pearl.
 		for (ItemStack stack : player.getInventory().getContents()) {
 			if (stack == null)
 				continue;
-			PrisonPearl pp = pearls.getPearlByItemStack(stack);
+			final PrisonPearl pp = pearls.getPearlByItemStack(stack);
 			if (pp == null)
 				continue;
-			pp.setHolder(player);
-			pp.markMove();
+			// We want to add a scheduler in case the other server sends a FakeLocation and overrides this.
+			// Issue is because the player doesn't quit on the the previous server until after they join this one.
+			Bukkit.getScheduler().runTaskLater(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+				@Override
+				public void run() {
+					pp.setHolder(player);
+					pp.markMove();
+				}
+				
+			}, 20);
 		}
 		
 		if (player.isDead())
