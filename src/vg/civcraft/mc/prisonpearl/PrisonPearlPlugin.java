@@ -15,6 +15,7 @@ import vg.civcraft.mc.prisonpearl.listener.DamageListener;
 import vg.civcraft.mc.prisonpearl.listener.MercuryListener;
 import vg.civcraft.mc.prisonpearl.listener.PlayerListener;
 import vg.civcraft.mc.prisonpearl.listener.PrisonPortaledPlayerListener;
+import vg.civcraft.mc.prisonpearl.listener.SummonListener;
 import vg.civcraft.mc.prisonpearl.managers.AltsListManager;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
@@ -87,6 +88,7 @@ public class PrisonPearlPlugin extends ACivMod {
 		new PrisonPortaledPlayerListener();
 		new CombatTagListener();
 		new BetterShardsListener();
+		new SummonListener();
 	}
 	
 	@Override
