@@ -160,7 +160,10 @@ public class PlayerListener implements Listener {
 
 			@Override
 			public void run() {
-				respawnPlayerCorrectly(event.getPlayer());
+				if (summon.isSummoned(event.getPlayer()))
+					summon.returnPlayer(pearls.getByImprisoned(event.getPlayer()));
+				else
+					respawnPlayerCorrectly(event.getPlayer());
 			}
 			
 		});
@@ -699,51 +702,5 @@ public class PlayerListener implements Listener {
 		pearls.freePearl(pp, reason);
 		return true;
 	}
-	
-    @EventHandler(priority=EventPriority.NORMAL)
-    private boolean onPlayerChatEvent(AsyncPlayerChatEvent event) {
-        if (summon.isSummoned(event.getPlayer()) && !summon.getSummon(event.getPlayer()).getCanSpeak()) {
-           event.setCancelled(true);
-        }
 
-        return true;
-    }
-
-    @EventHandler(priority=EventPriority.NORMAL)
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-
-        if (!(event.getDamager() instanceof Player)) {
-            return;
-        }
-
-        Player player = (Player)event.getDamager();
-
-        if(summon.isSummoned(player) && !summon.getSummon(player).getCanDamage()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority=EventPriority.NORMAL)
-    public void onBlockBreakEvent(BlockBreakEvent event) {
-
-        Player player = event.getPlayer();
-
-        if(summon.isSummoned(player) && !summon.getSummon(player).getCanBreak()) {
-            event.setCancelled(true);
-        }
-    }
-    
-    @EventHandler(priority=EventPriority.HIGHEST)
-	public void onSummonDeath(EntityDeathEvent event) {
-		if (!(event.getEntity() instanceof Player))
-			return;
-
-		Player player = (Player)event.getEntity();
-		if (!pearls.isImprisoned(player))
-			return;
-		
-		PrisonPearl pp = pearls.getByImprisoned(player);
-		if (summon.isSummoned(player))
-			summon.returnPlayer(pp);
-	}
 }

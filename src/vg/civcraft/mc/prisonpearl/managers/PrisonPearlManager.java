@@ -222,16 +222,25 @@ public class PrisonPearlManager {
 		return pp != null && freePearl(pp, reason);
 	}
 
-	public boolean freePearl(PrisonPearl pp, String reason) {
+	public boolean freePearl(final PrisonPearl pp, String reason) {
 		// set off an event
 		if (!prisonPearlEvent(pp, PrisonPearlEvent.Type.FREED)) {
 			return false;
 		}
 		storage.removePearl(pp, reason); // delete the pearl first
 		// unban alts and players if they are allowed to be
-		banManager.checkBan(pp.getImprisonedId());
-		banManager.checkBanForAlts(pp.getImprisonedId());
+		Bukkit.getScheduler().runTaskAsynchronously(PrisonPearlPlugin.getInstance(), new Runnable() {
+
+			@Override
+			public void run() {
+				banManager.checkBan(pp.getImprisonedId());
+				banManager.checkBanForAlts(pp.getImprisonedId());
+			}
+			
+		});
 		MercuryManager.updateLocationToMercury(pp, PrisonPearlEvent.Type.FREED);
+		
+		PrisonPearlPlugin.getSummonManager().removeSummon(pp);
 		
 		Player player = pp.getImprisonedPlayer();
 		updateAttachment(player);
