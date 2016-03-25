@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
@@ -20,13 +21,19 @@ public class SummonListener implements Listener{
 		Bukkit.getPluginManager().registerEvents(this, PrisonPearlPlugin.getInstance());
 	}
 	
+	public void onPlayerDeathEvent(EntityDeathEvent event) {
+		if (!(event.getEntity() instanceof Player))
+			return;
+		Player p = (Player) event.getEntity();
+		if (summon.isSummoned(p))
+			summon.getSummon(p).setToBeReturned(true);
+	}
+	
 	@EventHandler(priority=EventPriority.NORMAL)
-    private boolean onPlayerChatEvent(AsyncPlayerChatEvent event) {
+    public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
         if (summon.isSummoned(event.getPlayer()) && !summon.getSummon(event.getPlayer()).getCanSpeak()) {
            event.setCancelled(true);
         }
-
-        return true;
     }
 
     @EventHandler(priority=EventPriority.NORMAL)

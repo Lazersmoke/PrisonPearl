@@ -160,10 +160,7 @@ public class PlayerListener implements Listener {
 
 			@Override
 			public void run() {
-				if (summon.isSummoned(event.getPlayer()))
-					summon.returnPlayer(pearls.getByImprisoned(event.getPlayer()));
-				else
-					respawnPlayerCorrectly(event.getPlayer());
+				respawnPlayerCorrectly(event.getPlayer());
 			}
 			
 		});
