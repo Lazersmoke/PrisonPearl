@@ -20,6 +20,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Furnace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -31,6 +32,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -690,6 +692,18 @@ public class PlayerListener implements Listener {
 			return;
 
 		freePearl(pp, pp.getImprisonedName() + "("+pp.getImprisonedId() + ") is being freed. Reason: PrisonPearl item despawned.");
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onItemDamage(EntityDamageEvent event) {
+		Entity e = event.getEntity();
+		if (e.getType() != EntityType.DROPPED_ITEM || !event.getEntity().isDead()) 
+			return;
+		ItemStack s = ((Item) e).getItemStack();
+		PrisonPearl pp = pearls.getPearlByItemStack(s);
+		if (pp == null)
+			return;
+		freePearl(pp, pp.getImprisonedName() + "("+pp.getImprisonedId() + ") is being freed. Reason: PrisonPearl item was destroyed.");
 	}
 	
 	public boolean freePlayer(Player player, String reason) {
