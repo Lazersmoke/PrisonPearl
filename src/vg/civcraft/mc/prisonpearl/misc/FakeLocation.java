@@ -69,4 +69,9 @@ public class FakeLocation extends Location{
 	public int getBlockZ() {
 		return (int) z;
 	}
+	
+	@Override
+	public String toString() {
+		return server + " " + world + " " + x + " " + y + " " + z + " " + player;
+	}
 }

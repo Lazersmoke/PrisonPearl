@@ -189,8 +189,8 @@ public class MercuryListener implements Listener{
 			PrisonPearl pp = pearls.getByImprisoned(uuid);
 			String world = message[3];
 			int x = Integer.parseInt(message[4]);
-			int y = Integer.parseInt(message[4]);
-			int z = Integer.parseInt(message[4]);
+			int y = Integer.parseInt(message[5]);
+			int z = Integer.parseInt(message[6]);
 			Location returnLoc = new FakeLocation(world, x, y, z, server);
 			Summon s = new Summon(uuid, returnLoc, pp);
 			sm.addSummonPlayer(s);
