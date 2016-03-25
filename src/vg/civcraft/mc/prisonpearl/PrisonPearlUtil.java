@@ -87,7 +87,7 @@ public class PrisonPearlUtil {
 									dropInventory(p, p.getLocation(), PrisonPearlConfig.shouldPpsummonLeavePearls());
 								}
 								loc = (FakeLocation) s.getPearlLocation();
-								TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY(),
+								TeleportInfo info = new TeleportInfo(loc.getWorldName(), loc.getServerName(), loc.getBlockX(), loc.getBlockY() + 1,
 										loc.getBlockZ());
 								BetterShardsAPI.teleportPlayer(info.getServer(), p.getUniqueId(), info);
 								return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);

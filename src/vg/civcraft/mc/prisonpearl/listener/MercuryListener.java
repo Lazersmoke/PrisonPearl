@@ -172,9 +172,7 @@ public class MercuryListener implements Listener{
 			PrisonPearl pp = pearls.getByImprisoned(uuid);
 			// Job of the shard holding the player in the prison world to add to mysql.
 			if (sm.summonPlayer(pearls.getByImprisoned(p))) {
-				FakeLocation loc = (FakeLocation) pp.getLocation();
-				TeleportInfo info = new TeleportInfo(loc.getWorldName(), toServer, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-				BetterShardsAPI.teleportPlayer(toServer, uuid, info);
+				// SummonPlayer will trigger a respawnPlayerCorrectly that will teleport the player to the pearl cords.
 				MercuryManager.acceptPPSummon(uuid, p.getLocation());
 			}
 		}
