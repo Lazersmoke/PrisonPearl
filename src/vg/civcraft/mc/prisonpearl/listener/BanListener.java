@@ -34,6 +34,7 @@ public class BanListener implements Listener{
 		if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
 			return;
 		}
+		
 		if (!ban.isBanned(uuidName)) {
 			sb.append(" Banned UUID: " + false);
 			PrisonPearlPlugin.log(sb.toString());

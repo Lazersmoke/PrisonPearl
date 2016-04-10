@@ -101,7 +101,6 @@ public class PlayerListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		pearls.updateAttachment(player);
-		ban.checkBan(player.getUniqueId());
 		UUID uuid = player.getUniqueId();
 
 		// In case a player comes from another server and has a pearl.
