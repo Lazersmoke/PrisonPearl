@@ -64,11 +64,10 @@ public class PrisonPearlManager {
 		storage = dbHandler.getStorageHandler().getPrisonPearlStorage();
 		banManager = PrisonPearlPlugin.getBanManager();
 		
-		feedPearls();
-		
 		// PreCache needed alts.
-		for (PrisonPearl pp : storage.getAllPearls())
+		for (PrisonPearl pp : storage.getAllPearls()) {
 			altsManager.cacheAltListFor(pp.getImprisonedId());
+		}
 	}
 	
 	public boolean imprisonPlayer(Player imprisoned, Player imprisoner) {
