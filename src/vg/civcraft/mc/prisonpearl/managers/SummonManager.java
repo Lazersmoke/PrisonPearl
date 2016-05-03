@@ -18,6 +18,7 @@ import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.PrisonPearlUtil;
 import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.database.interfaces.ISummonStorage;
+import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class SummonManager {
 
@@ -89,10 +90,13 @@ public class SummonManager {
 			Summon s = getSummon(pearl);
 			s.setToBeReturned(true);
 			PrisonPearlUtil.respawnPlayerCorrectly(pearled);
-			s.setToBeReturned(false);
-			storage.removeSummon(s);
-			MercuryManager.returnPPSummon(pearled.getUniqueId());
-			return true;
+			if (!(s.getReturnLocation() instanceof FakeLocation)) {
+				s.setToBeReturned(false);
+				storage.removeSummon(s);
+				MercuryManager.returnPPSummon(pearled.getUniqueId());
+				s.setTime(System.currentTimeMillis());
+				return true;
+			}
 		}
 		return false;
 	}
@@ -104,9 +108,13 @@ public class SummonManager {
 		storage.removeSummon(s);
 		return true;
 	}
+	
+	public Summon getSummon(UUID uuid) {
+		return storage.getSummon(uuid);
+	}
 
 	public Summon getSummon(Player p) {
-		return storage.getSummon(p.getUniqueId());
+		return getSummon(p.getUniqueId());
 	}
 
 	public Summon getSummon(PrisonPearl pearl) {

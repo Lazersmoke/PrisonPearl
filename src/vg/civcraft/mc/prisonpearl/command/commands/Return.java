@@ -1,7 +1,6 @@
 package vg.civcraft.mc.prisonpearl.command.commands;
 
 import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 
@@ -49,8 +49,16 @@ public class Return extends PlayerCommand{
 			p.sendMessage(ChatColor.RED + "The player is offline, cannot be returned safely.");
 			return true;
 		}
+		Summon s = summon.getSummon(pearl);
+		if (s.getLastSummonedReturned() + 1000 * 5 > System.currentTimeMillis()) {
+			p.sendMessage(ChatColor.RED + "Please wait the player was just recently summoned.");
+			return true;
+		}
 		if (!summon.returnPlayer(pearl)) { // There was an issue returning the player.
-			p.sendMessage(ChatColor.RED + "There was an issue returning the player.");
+			p.sendMessage(ChatColor.RED + "Attempting to return the player.");
+			// This can be caused by a player failing to be returned. 
+			// Looks at bettershardslistener playerEnsuredToTransit and playerFailedToTransit
+			// methods as they will provide the next stage of code.
 			return true;
 		}
 		p.sendMessage(ChatColor.GREEN + "You have successfully returned the player.");
