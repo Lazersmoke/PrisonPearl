@@ -18,9 +18,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import net.minecraft.server.v1_8_R3.PlayerInteractManager;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 import net.minelink.ctplus.Npc;
 import net.minelink.ctplus.event.NpcDespawnEvent;
 import net.minelink.ctplus.event.NpcDespawnReason;
