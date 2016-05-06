@@ -53,6 +53,8 @@ public class BetterShardsListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerFailedToTransit(PlayerFailedToTransitEvent event) {
 		UUID uuid = event.getUUID();
+		if (!summons.isSummoned(uuid))
+			return;
 		Summon s = summons.getSummon(uuid);
 		s.setToBeReturned(false);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
@@ -64,6 +66,8 @@ public class BetterShardsListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerEnsuredToTransit(PlayerEnsuredToTransitEvent event) {
 		UUID uuid = event.getUUID();
+		if (!summons.isSummoned(uuid))
+			return;
 		Summon s = summons.getSummon(uuid);
 		s.setToBeReturned(false);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);

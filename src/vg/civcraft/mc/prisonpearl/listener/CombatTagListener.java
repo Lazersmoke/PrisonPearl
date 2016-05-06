@@ -1,6 +1,5 @@
 package vg.civcraft.mc.prisonpearl.listener;
 
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -9,10 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,10 +20,8 @@ import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 import net.minelink.ctplus.Npc;
 import net.minelink.ctplus.event.NpcDespawnEvent;
 import net.minelink.ctplus.event.NpcDespawnReason;
-import vg.civcraft.mc.bettershards.BetterShardsPlugin;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
-import vg.civcraft.mc.prisonpearl.managers.CombatTagManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 
 public class CombatTagListener implements Listener{
