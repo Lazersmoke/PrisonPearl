@@ -35,7 +35,7 @@ public class Return extends PlayerCommand{
 			return true;
 		}
 		Player p = (Player) sender;
-		ItemStack stack = p.getItemInHand();
+		ItemStack stack = p.getInventory().getItemInMainHand();
 		PrisonPearl pearl = pearls.getPearlByItemStack(stack);
 		if (pearl == null) {
 			p.sendMessage(ChatColor.RED + "You are not holding a PrisonPearl.");
@@ -47,6 +47,10 @@ public class Return extends PlayerCommand{
 		}
 		if (pearl.getImprisonedPlayer() == null) {
 			p.sendMessage(ChatColor.RED + "The player is offline, cannot be returned safely.");
+			return true;
+		}
+		if (PrisonPearlPlugin.getCombatTagManager().isCombatTagged(pearl.getImprisonedPlayer())) {
+			p.sendMessage(ChatColor.RED + "The player is combat tagged and cannot be returned.");
 			return true;
 		}
 		Summon s = summon.getSummon(pearl);

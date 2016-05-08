@@ -34,7 +34,7 @@ public class SummonCommand extends PlayerCommand{
 			return true;
 		}
 		Player p = (Player) sender;
-		PrisonPearl pearl = pearls.getPearlByItemStack(p.getItemInHand());
+		PrisonPearl pearl = pearls.getPearlByItemStack(p.getInventory().getItemInMainHand());
 		if (pearl == null) {
 			p.sendMessage(ChatColor.RED + "That is not a PrisonPearl.");
 			return true;

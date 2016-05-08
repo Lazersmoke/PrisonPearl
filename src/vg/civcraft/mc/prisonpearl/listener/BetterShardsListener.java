@@ -56,6 +56,8 @@ public class BetterShardsListener implements Listener{
 		if (!summons.isSummoned(uuid))
 			return;
 		Summon s = summons.getSummon(uuid);
+		if (!s.isToBeReturned())
+			return;
 		s.setToBeReturned(false);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
 		Player p = pp.getHolderPlayer();
@@ -69,6 +71,8 @@ public class BetterShardsListener implements Listener{
 		if (!summons.isSummoned(uuid))
 			return;
 		Summon s = summons.getSummon(uuid);
+		if (!s.isToBeReturned())
+			return;
 		s.setToBeReturned(false);
 		PrisonPearl pp = pearls.getByImprisoned(uuid);
 		summons.removeSummon(pp);
