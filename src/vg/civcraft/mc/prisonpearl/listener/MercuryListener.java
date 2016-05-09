@@ -19,6 +19,7 @@ import vg.civcraft.mc.mercury.events.AsyncPluginBroadcastMessageEvent;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.Summon;
+import vg.civcraft.mc.prisonpearl.command.commands.Locate;
 import vg.civcraft.mc.prisonpearl.events.PrisonPearlEvent;
 import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
 import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
@@ -192,6 +193,9 @@ public class MercuryListener implements Listener{
 			Location returnLoc = new FakeLocation(world, x, y, z, server);
 			Summon s = new Summon(uuid, returnLoc, pp);
 			sm.addSummonPlayer(s);
+			Player holder = pp.getHolderPlayer();
+			if (holder != null)
+				holder.sendMessage(ChatColor.GREEN + "The player has been summoned.");
 		}
 	}
 	
@@ -224,7 +228,24 @@ public class MercuryListener implements Listener{
 	}
 	
 	private void prisonPearlLocate(String[] parts, String originServer) {
-		// Going to lower the timer for pearl updates. We can maybe add this later no need right now.
+		String type = parts[1];
+		UUID uuid = UUID.fromString(parts[2]);
+		if (type.equals("request")) {
+			PrisonPearl pp = pearls.getByImprisoned(uuid);
+			if (pp == null)
+				return;
+			if (pp.getLocation() instanceof FakeLocation)
+				return;
+			MercuryManager.sendPPLocate(pp);
+		}
+		else if (type.equals("send")) {
+			FakeLocation loc = new FakeLocation(parts[3], Double.parseDouble(parts[4]), Double.parseDouble(parts[5]),
+					Double.parseDouble(parts[6]), parts[7]);
+			PrisonPearl pp = pearls.getByImprisoned(uuid);
+			pp.setHolder(loc);
+			pp.markMove();
+			Locate.broadCastPearl(pp); // Sends the pp message to players who may be waiting for it.
+		}
 	}
 
 }

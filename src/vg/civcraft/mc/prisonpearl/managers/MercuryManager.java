@@ -183,8 +183,8 @@ public class MercuryManager {
 		if (!isMercuryEnabled)
 			return;
 		Location loc = pp.getLocation();
-		String message = String.format("locate|send|%s|%d|%d|%d", loc.getWorld().getName(),
-				loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+		String message = String.format("locate|send|%s|%s|%d|%d|%d|%s", pp.getImprisonedId().toString(), loc.getWorld().getName(),
+				loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), pp.getHolderName());
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 }

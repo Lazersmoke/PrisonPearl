@@ -1,5 +1,6 @@
 package vg.civcraft.mc.prisonpearl.command.commands;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,12 +12,14 @@ import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
+import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 
 public class Locate extends PlayerCommand{
 
 	private PrisonPearlManager manager;
-	private BroadcastManager broad;
+	private static BroadcastManager broad;
+	public static List<PrisonPearl> locate = new ArrayList<PrisonPearl>();
 	
 	public Locate(String name) {
 		super(name);
@@ -40,14 +43,29 @@ public class Locate extends PlayerCommand{
 			return true;
 		}
 		PrisonPearl pearl = manager.getByImprisoned(p);
-		broad.broadcast(pearl.getImprisonedId());
 		if (!pearl.verifyLocation())
 			manager.freePearl(pearl, String.format("Prison Pearl %s could not authenticate.", pearl.getImprisonedId().toString()));
+		if (pearl.getLastMoved() + 3000 < System.currentTimeMillis()) { // if its been more than 3 seconds since last update.
+			p.sendMessage(ChatColor.YELLOW + "Requesting pplocate.");
+			locate.add(pearl);
+			MercuryManager.requestPPLocate(pearl);
+			return true;
+		}
+		broad.broadcast(pearl.getImprisonedId());
 		p.sendMessage(ChatColor.YELLOW + "Your pearl is " + pearl.describeLocation());
 		return true;
 	}
 
 	public List<String> tabComplete(CommandSender sender, String[] args) {
 		return new LinkedList<String>(); // empty list
-	}	
+	}
+	
+	public static void broadCastPearl(PrisonPearl pp) {
+		if (!locate.remove(pp))
+			return;
+		broad.broadcast(pp.getImprisonedId());
+		Player p = pp.getImprisonedPlayer();
+		if (p != null)
+		p.sendMessage(ChatColor.YELLOW + "Your pearl is " + pp.describeLocation());
+	}
 }
