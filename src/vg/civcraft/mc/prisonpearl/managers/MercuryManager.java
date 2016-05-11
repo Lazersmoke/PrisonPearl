@@ -139,7 +139,7 @@ public class MercuryManager {
 		if (!isMercuryEnabled)
 			return;
 		StringBuilder builder = new StringBuilder();
-		builder.append("broadcast|send|" + pearled.toString());
+		builder.append("broadcast|send|" + pearled.toString() + "|");
 		for (int x = 0; x < receivers.size(); x++) {
 			builder.append(receivers.get(x).toString());
 			if (x + 1 < receivers.size())
@@ -150,25 +150,29 @@ public class MercuryManager {
 	
 	public static boolean isPlayerOnline(UUID uuid) {
 		if (!isMercuryEnabled)
-			for (Player p: Bukkit.getOnlinePlayers())
+			for (Player p: Bukkit.getOnlinePlayers()) {
 				if (p.getUniqueId().equals(uuid))
 					return true;
+			}
 		else
-			for (UUID x: MercuryAPI.getAllAccounts())
+			for (UUID x: MercuryAPI.getAllAccounts()) {
 				if (x.equals(uuid))
 					return true;
+			}
 		return false;
 	}
 	
 	public static boolean isPlayerOnline(String name) {
 		if (!isMercuryEnabled)
-			for (Player p: Bukkit.getOnlinePlayers())
+			for (Player p: Bukkit.getOnlinePlayers()) {
 				if (p.getName().equalsIgnoreCase(name))
 					return true;
+			}
 		else
-			for (String x: MercuryAPI.getAllPlayers())
+			for (String x: MercuryAPI.getAllPlayers()) {
 				if (x.equalsIgnoreCase(name))
 					return true;
+			}
 		return false;
 	}
 	

@@ -40,7 +40,7 @@ public class ConfirmBroadcast extends PlayerCommand{
 			p.sendMessage(ChatColor.RED + "That player does not exist.");
 			return true;
 		}
-		if (!broadcast.isRequestedPlayer(uuid, p.getUniqueId())) {
+		if (!broadcast.isRequestedPlayer(p.getUniqueId(), uuid)) {
 			p.sendMessage(ChatColor.RED + "That player has not requested that you broadcast to him.");
 			return true;
 		}

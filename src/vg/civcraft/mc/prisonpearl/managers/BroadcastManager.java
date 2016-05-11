@@ -45,7 +45,7 @@ public class BroadcastManager {
 		Player p = Bukkit.getPlayer(receiver);
 		if (PrisonPearlPlugin.isMercuryEnabled()) {
 			// Sharding code. Lel flying monkeys everywhere.
-			if (MercuryAPI.getAllAccounts().contains(receiver))
+			if (!MercuryManager.isPlayerOnline(receiver))
 				return false;
 			if (p == null) {
 				MercuryManager.requestBroadcast(pearled, receiver);
@@ -62,6 +62,20 @@ public class BroadcastManager {
 				+ " to accept type /ppconfirm <name>", NameLayerManager.getName(receiver)));
 		request.put(receiver, pearled);
 		return true;
+	}
+	
+	/**
+	 * This method is used by a mercury message to alert a player that they are being sent a boradcast request.
+	 * @param pearled
+	 * @param receiever
+	 */
+	public void requestBroadcastFromMercury(UUID pearled, UUID receiver) {
+		Player p = Bukkit.getPlayer(receiver);
+		if (p == null)
+			return;
+		p.sendMessage(ChatColor.GREEN + String.format("You have been sent a request to allow listens to pplocate by %s,"
+				+ " to accept type /ppconfirm <name>", NameLayerManager.getName(receiver)));
+		request.put(receiver, pearled);
 	}
 	
 	/**
@@ -101,10 +115,12 @@ public class BroadcastManager {
 	 * @param pp
 	 */
 	public void broadcastMessage(Player receiver, PrisonPearl pp) {
-		receiver.sendMessage(ChatColor.GREEN + pp.describeLocation());
+		receiver.sendMessage(ChatColor.GREEN + pp.getImprisonedName() + " is " + pp.describeLocation() + ".");
 	}
 	
 	public boolean isRequestedPlayer(UUID receiver, UUID pearled) {
+		if (request.get(receiver) == null)
+			return false;
 		return request.get(receiver).equals(pearled);
 	}
 	

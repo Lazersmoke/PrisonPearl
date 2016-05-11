@@ -214,7 +214,7 @@ public class MercuryListener implements Listener{
 		else if (type.equals("request")) {
 			UUID pearled = UUID.fromString(parts[2]);
 			UUID receiver = UUID.fromString(parts[3]);
-			bm.requestBroadcast(pearled, receiver);
+			bm.requestBroadcastFromMercury(pearled, receiver);
 		}
 		else if (type.equals("send")) {
 			PrisonPearl pp = pearls.getByImprisoned(UUID.fromString(parts[2]));
@@ -240,7 +240,7 @@ public class MercuryListener implements Listener{
 		}
 		else if (type.equals("send")) {
 			FakeLocation loc = new FakeLocation(parts[3], Double.parseDouble(parts[4]), Double.parseDouble(parts[5]),
-					Double.parseDouble(parts[6]), parts[7]);
+					Double.parseDouble(parts[6]), originServer, parts[7]);
 			PrisonPearl pp = pearls.getByImprisoned(uuid);
 			pp.setHolder(loc);
 			pp.markMove();
