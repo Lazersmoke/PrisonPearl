@@ -101,6 +101,7 @@ public class WorldBorderMysqlStorage implements IWorldBorderStorage{
 				e.printStackTrace();
 			}
 		}
+		locs.add(loc);
 	}
 
 	@Override
@@ -124,6 +125,7 @@ public class WorldBorderMysqlStorage implements IWorldBorderStorage{
 				e.printStackTrace();
 			}
 		}
+		locs.remove(loc);
 	}
 
 	@Override

@@ -164,6 +164,11 @@ public class PrisonPearlConfig {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("kickMessage").getString();
 	}
 	
+	@CivConfig(name = "alts.enabled", def = "true", type = CivConfigType.Bool)
+	public static boolean getShouldEnableAltsManager(){
+		return PrisonPearlPlugin.getInstance().GetConfig().get("alts.enabled").getBool();
+	}
+	
 	@CivConfig(name = "alts.max_imprisoned", def = "2", type = CivConfigType.Int)
 	public static int getMaxAltsAllowed() {
 		return PrisonPearlPlugin.getInstance().GetConfig().get("alts.max_imprisoned").getInt();

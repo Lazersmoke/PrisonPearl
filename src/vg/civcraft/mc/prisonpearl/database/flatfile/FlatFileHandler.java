@@ -9,43 +9,51 @@ import vg.civcraft.mc.prisonpearl.database.interfaces.IWorldBorderStorage;
 
 public class FlatFileHandler implements ISaveLoad, IStorageHandler{
 
+	private PrisonPearlFileStorage prisonPearlStorage;
+	private PrisonPortaledFileStorage prisonPortalStorage;
+	private SummonFileStorage summonFileStorage;
+	private WorldBorderFileStorage worldBorderFileStorage;
+	
 	public FlatFileHandler() {
-		
+		prisonPearlStorage = new PrisonPearlFileStorage();
+		prisonPortalStorage = new PrisonPortaledFileStorage();
+		summonFileStorage = new SummonFileStorage();
+		worldBorderFileStorage = new WorldBorderFileStorage();
 	}
 
 	@Override
 	public IPrisonPearlStorage getPrisonPearlStorage() {
-		// TODO Auto-generated method stub
-		return null;
+		return prisonPearlStorage;
 	}
 
 	@Override
 	public IPrisonPortaledStorage getPrisonPortaledStorage() {
-		// TODO Auto-generated method stub
-		return null;
+		return prisonPortalStorage;
 	}
 
 	@Override
 	public ISummonStorage getSummonStorage() {
-		// TODO Auto-generated method stub
-		return null;
+		return summonFileStorage;
 	}
 
 	@Override
 	public IWorldBorderStorage getWorldBorderStorage() {
-		// TODO Auto-generated method stub
-		return null;
+		return worldBorderFileStorage;
 	}
 
 	@Override
 	public void save() {
-		// TODO Auto-generated method stub
-		
+		prisonPearlStorage.save();
+		prisonPortalStorage.save();
+		summonFileStorage.save();
+		worldBorderFileStorage.save();
 	}
 
 	@Override
 	public void load() {
-		// TODO Auto-generated method stub
-		
+		prisonPearlStorage.load();
+		prisonPortalStorage.load();
+		summonFileStorage.load();
+		worldBorderFileStorage.load();
 	}
 }

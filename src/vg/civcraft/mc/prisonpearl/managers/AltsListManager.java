@@ -15,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.events.AltsListEvent;
 import vg.civcraft.mc.prisonpearl.events.RequestAltsListEvent;
@@ -35,6 +36,8 @@ public class AltsListManager implements Listener {
 	}
 
 	public void queryForUpdatedAltLists(List<UUID> playersToCheck) {
+		if (!PrisonPearlConfig.getShouldEnableAltsManager())
+			return;
 		// Fires the RequestAltsListEvent event with the list of players to
 		// check. This event won't contain results upon return. It is up to
 		// the upstream event handler to fire the AltsListEvent synchronously
@@ -47,6 +50,8 @@ public class AltsListManager implements Listener {
 	}
 
 	public void cacheAltListFor(UUID playerUUID) {
+		if (!PrisonPearlConfig.getShouldEnableAltsManager())
+			return;
 		if (altsHash.containsKey(playerUUID)) {
 			return;
 		}
@@ -57,11 +62,15 @@ public class AltsListManager implements Listener {
 	}
 	
 	public List<UUID> getAlts(UUID uuid) {
+		if (!PrisonPearlConfig.getShouldEnableAltsManager())
+			return null;
 		// This method needs to stay like this.  Time bomb otherwise when AltsListner requests alts.
 		return altsHash.get(uuid);
 	}
 
 	public UUID[] getAltsArray(UUID uuid) {
+		if (!PrisonPearlConfig.getShouldEnableAltsManager())
+			return new UUID[0];
 		if (!altsHash.containsKey(uuid)){
 			List<UUID> uuids = new ArrayList<UUID>();
 			uuids.add(uuid);
@@ -85,6 +94,8 @@ public class AltsListManager implements Listener {
 	}
 	
 	public synchronized void addAltsHash(UUID uuid, List<UUID> list) {
+		if (!PrisonPearlConfig.getShouldEnableAltsManager())
+			return;
 		altsHash.put(uuid, list);
 	}
 }
