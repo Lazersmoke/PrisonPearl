@@ -257,7 +257,7 @@ public class PrisonPearlManager {
 		// Log the free'ing PrisonPearl event with coordinates.
 		Player imprisoner = pp.getHolderPlayer();
 		String playerLoc = player != null ? serializeLocation(player.getLocation()) : "[???]";
-		String message = String.format("Something weird has happened with the pearl " + pp.getImprisonedName());
+		String message = String.format("Something weird has happened with the pearl " + pp.getImprisonedName() + ", were they maybe freed by pearl feeding?");
 		
 		if (imprisoner != null) {
 			String imprisonerLoc = serializeLocation(imprisoner.getLocation());
