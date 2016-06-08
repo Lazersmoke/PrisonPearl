@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.untamedears</groupId>
 	<artifactId>PrisonPearl</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.60</version>
+	<version>3.0.61</version>
 	<name>PrisonPearl</name>
 	<url>https://github.com/Civcraft/PrisonPearl</url>
 
@@ -32,10 +31,10 @@
 
 	<dependencies>
 		<dependency>
-        		<groupId>org.spigotmc</groupId>
-        		<artifactId>Spigot</artifactId>
-           		<version>1.9</version>
-           		<scope>provided</scope>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot</artifactId>
+			<version>1.9</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>vg.civcraft.mc.namelayer</groupId>
@@ -91,9 +90,9 @@
 			<url>http://repo.minelink.net/content/repositories/releases/</url>
 		</repository>
 		<repository>
-        		<id>spigot-repo</id>
-			 <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    		</repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 </project>
 

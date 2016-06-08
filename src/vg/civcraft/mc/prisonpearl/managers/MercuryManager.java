@@ -3,7 +3,6 @@ package vg.civcraft.mc.prisonpearl.managers;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -81,7 +80,7 @@ public class MercuryManager {
 		else
 			worldName = loc.getWorld().getName();
 		String message = "update|" + type.name() + "|" + uuid.toString() + "|" + worldName + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + 
-		loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd();
+		loc.getBlockZ() + "|" + pp.getUniqueIdentifier() + "|" + playerName + "|" + pp.getMotd() + "|" + pp.getKillerUUID() + "|" + pp.getImprisonTime();
 		MercuryAPI.sendGlobalMessage(message, channel);
 	}
 	

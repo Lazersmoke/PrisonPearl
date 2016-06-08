@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-
 import vg.civcraft.mc.cbanman.CBanManagement;
 import vg.civcraft.mc.cbanman.ban.Ban;
 import vg.civcraft.mc.cbanman.ban.BanLevel;

@@ -44,7 +44,7 @@ public class SetDistance extends PlayerCommand{
 			p.sendMessage(ChatColor.RED + "That is not a valid number.");
 			return true;
 		}
-		PrisonPearl pearl = pearls.getPearlByItemStack(p.getItemInHand());
+		PrisonPearl pearl = pearls.getPearlByItemStack(p.getInventory().getItemInMainHand());
 		if (pearl == null) {
 			p.sendMessage(ChatColor.RED + "Your are not holding a Prison Pearl.");
 			return true;

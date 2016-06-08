@@ -55,7 +55,7 @@ public class Free extends PlayerCommand {
 			}
 		}
 		else {
-			ItemStack is = p.getItemInHand();
+			ItemStack is = p.getInventory().getItemInMainHand();
 			pearl = manager.getPearlByItemStack(is);
 			if (pearl == null) {
 				p.sendMessage(ChatColor.RED + "You are not holding a valid ender pearl");

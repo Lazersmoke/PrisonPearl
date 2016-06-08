@@ -4,7 +4,6 @@ import java.util.List;
 
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
-import vg.civcraft.mc.civmodcore.annotations.CivConfigs;
 
 public class PrisonPearlConfig {
 

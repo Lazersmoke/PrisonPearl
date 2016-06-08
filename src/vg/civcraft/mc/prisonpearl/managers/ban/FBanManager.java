@@ -13,12 +13,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
 
@@ -26,7 +20,6 @@ public class FBanManager extends BanManager {
 	final public static String BAN_MSG = "Banned for having too many imprisoned alts!";
 	final public static String JOURNAL_BASE_NAME = "ban_journalUUID";
 
-	private PrisonPearlPlugin plugin_ = null;
 	private Set<UUID> bannedUUIDs_ = new TreeSet<UUID>();
 	private File banJournal_ = null;
 	private File banJournalBakOne_ = null;
@@ -36,7 +29,6 @@ public class FBanManager extends BanManager {
 	private String journalBaseName_ = JOURNAL_BASE_NAME;
 
 	public FBanManager(final PrisonPearlPlugin plugin) {
-		plugin_ = plugin;
 		setDirectory(plugin.getDataFolder());
 	}
 
