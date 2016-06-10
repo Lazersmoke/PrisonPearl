@@ -170,22 +170,9 @@ public class PrisonPearlManager {
 		pp.markMove();
 
 		// Create the inventory item
-		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
-		ItemMeta im = is.getItemMeta();
-		// Rename pearl to that of imprisoned player
-		im.setDisplayName(name);
-		List<String> lore = new ArrayList<String>();
-		// Gives pearl lore that says more info when hovered over
-		lore.add(name + " is held within this pearl");
-		lore.add("UUID: "+pp.getImprisonedId());
-		lore.add("Unique: " + pp.getUniqueIdentifier());
-		// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
-		im.addEnchant(Enchantment.DURABILITY, 1, true);
-		im.setLore(lore);
-		is.setItemMeta(im);
+		ItemStack is = generatePearlItem(pp);
 		// Give it to the imprisoner
 		inv.setItem(pearlnum, is);
-		// Reason for edit: Gives pearl enchantment effect (distinguishable, unstackable) Gives name of prisoner in inventory.
 
 
         //check if imprisoned was imprisoned by themselves
@@ -385,29 +372,6 @@ public class PrisonPearlManager {
 		return false;
 	}
 	
-	public PrisonPearl getPearlByItemStack(ItemStack stack) {
-		if (stack == null || !stack.hasItemMeta() || stack.getType() != Material.ENDER_PEARL)
-    		return null;
-    	if (!stack.getItemMeta().hasLore())
-    		return null;
-    	List<String> lore = stack.getItemMeta().getLore();
-    	if (lore.size() != 3)
-    		return null;
-    	UUID uuid = UUID.fromString(lore.get(1).split(" ")[1]);
-    	PrisonPearl pp = storage.getByImprisoned(uuid);
-    	if (pp == null){
-    		stack.setItemMeta(null);
-    		return null;
-    	}
-    	int id = Integer.parseInt(lore.get(2).split(" ")[1]);
-    	boolean isValid = uuid.equals(pp.getImprisonedId()) && id == pp.getUniqueIdentifier();
-		if (!isValid) {
-			stack.setItemMeta(null);
-			pp = null;
-		}
-    	return pp;
-	}
-	
 	public boolean isImprisoned(UUID uuid) {
 		return storage.isImprisoned(uuid);
 	}
@@ -447,7 +411,6 @@ public class PrisonPearlManager {
 	 */
 	public void feedPearls() {
 		String message = "";
-		String log = "";
 		Collection <PrisonPearl> pearls = storage.getAllPearls();
 
 		long inactive_seconds = PrisonPearlConfig.getIgnoreFeedSecond();
@@ -459,7 +422,7 @@ public class PrisonPearlManager {
 			PrisonPearlPlugin.log("Pearls have already been fed, not gonna do it again just yet");
 			return;
 		} else {
-			log+="\nSetting last feed time";
+			message+="\nSetting last feed time";
 			storage.updateLastFeed(System.currentTimeMillis());
 		}
 		
@@ -475,13 +438,13 @@ public class PrisonPearlManager {
 			HolderStateToInventoryResult retval = HolderStateToInventory(pp, inv);
 			Location loc = pp.getLocation();
 			if (loc instanceof FakeLocation) { // Not on server
-				log+="\n" + pp.getImprisonedName() + " was skipped feeding because he is not on the current server.";
+				message+="\n" + pp.getImprisonedName() + " was skipped feeding because he is not on the current server.";
 				continue; // Other server will handle feeding
 			}
 			if (retval == HolderStateToInventoryResult.BAD_CONTAINER) {
 				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, container was corrupt.";
 				freePearl(pp, reason);
-				log+="\n freed:"+prisonerId+",reason:"+"badcontainer";
+				message+="\n freed:"+prisonerId+",reason:"+"badcontainer";
 				freedpearls++;
 				continue;
 			} else if (retval != HolderStateToInventoryResult.SUCCESS) {
@@ -490,7 +453,7 @@ public class PrisonPearlManager {
 			else if (isWorldBorderEnabled && PrisonPearlPlugin.getWorldBorderManager().isMaxFeed(loc)){
 				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, was outside max distance.";
 				freePearl(pp, reason);
-				log+="\n freed:"+prisonerId+",reason:"+"maxDistance";
+				message+="\n freed:"+prisonerId+",reason:"+"maxDistance";
 				freedpearls++;
 				continue;
 			}
@@ -500,7 +463,7 @@ public class PrisonPearlManager {
 				inactive_time += inactive_millis;
 				if (inactive_time <= System.currentTimeMillis()) {
 					// if player has not logged on in the set amount of time than ignore feeding
-					log += "\nnot fed inactive: " + prisonerId;
+					message += "\nnot fed inactive: " + prisonerId;
 					continue;
 				}
 			}
@@ -516,18 +479,18 @@ public class PrisonPearlManager {
 				inv[0].removeItem(requirement);
 				pearlsfed++;
 				coalfed += requirementSize;
-				log+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
+				message+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
 			} else if(inv[1] != null && inv[1].containsAtLeast(requirement,requirementSize)){
 				message = message + "\n Chest contains enough purestrain coal.";
 				inv[1].removeItem(requirement);
 				pearlsfed++;
 				coalfed += requirementSize;
-				log+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
+				message+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
 			} else {
 				message = message + "\n Chest does not contain enough purestrain coal.";
 				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, container did not have enough coal.";
 				freePearl(pp, reason);
-				log+="\n freed:"+prisonerId+",reason:"+"nocoal"+",location:"+pp.describeLocation();
+				message+="\n freed:"+prisonerId+",reason:"+"nocoal"+",location:"+pp.describeLocation();
 				freedpearls++;
 			}
 		}
@@ -540,7 +503,7 @@ public class PrisonPearlManager {
 	 * @param stack ItemStack to get the PrisonPearl for
 	 * @return PrisonPearl of the player imprisoned in the given ItemStack or null if no player is imprisoned in that item
 	 */
-	public PrisonPearl getPearlbyItemStack(ItemStack stack) {
+	public PrisonPearl getPearlByItemStack(ItemStack stack) {
 		if (stack == null || !stack.hasItemMeta() || stack.getType() != Material.ENDER_PEARL)
     		return null;
     	if (!stack.getItemMeta().hasLore())
@@ -584,6 +547,7 @@ public class PrisonPearlManager {
     		ItemStack is = inv.getItem(i);
     		if (isLegacyPearl(is, prisonerName)) {
     			inv.setItem(i, null);
+    			PrisonPearlPlugin.getInstance().info("Removed legacy pearl holding " + uuid + " at " + b.getLocation());
     			return;
     		}
     	}
@@ -609,6 +573,7 @@ public class PrisonPearlManager {
     	    		ItemStack is = inv.getItem(i);
     	    		if (isLegacyPearl(is, prisonerName)) {
     	    			inv.setItem(i, null);
+    	    			PrisonPearlPlugin.getInstance().info("Removed legacy pearl holding " + uuid + " at " + adjacentChest.getLocation());
     	    			return;
     	    		}
     	    	}
@@ -623,7 +588,7 @@ public class PrisonPearlManager {
 		if (is.getType() == Material.ENDER_PEARL && is.hasItemMeta() && is.getItemMeta().hasDisplayName() && 
 				is.getItemMeta().getDisplayName().equals(prisonerName)) {
 			//pearl with the name of the imprisoned player
-			if (getPearlbyItemStack(is) == null) {
+			if (getPearlByItemStack(is) == null) {
 				//not a valid pearl the way pearls are currently tracked
 				return true;
 			}
@@ -682,7 +647,7 @@ public class PrisonPearlManager {
     			ItemStack s = i.getItem(x);
     			if (s == null || s.getType() != Material.ENDER_PEARL)
     				continue;
-    			PrisonPearl tmp = getPearlbyItemStack(s);
+    			PrisonPearl tmp = getPearlByItemStack(s);
     			if (tmp == null)
     				continue;
     			if (tmp.getImprisonedId().equals(uuid)) {
@@ -699,27 +664,14 @@ public class PrisonPearlManager {
         			break;
         		for (int x = 0; x < i.getSize(); x++) {
         			ItemStack current = i.getItem(x);
-        			if (getPearlbyItemStack(current) == null) {
+        			if (current == null) {
         				storage.removePearl(pp, "Regenerating pearl cause it was lost. UUID is: " + pp.getImprisonedId().toString());
         				String name = NameLayerManager.getName(uuid);
         				pp = new PrisonPearl(name, uuid, loc, new Random().nextInt(1000), pp.getKillerUUID(), pp.getImprisonTime());
         				addPearl(pp);
-        				ItemStack is = generatePearlItem(pp);
-        				ItemMeta im = is.getItemMeta();
-        				// Rename pearl to that of imprisoned player
-        				im.setDisplayName(name);
-        				List<String> lore = new ArrayList<String>();
-        				// Gives pearl lore that says more info when hovered over
-        				lore.add(name + " is held within this pearl");
-        				lore.add("UUID: "+pp.getImprisonedId());
-        				lore.add("Unique: " + pp.getUniqueIdentifier());
-        				// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
-        				im.addEnchant(Enchantment.DURABILITY, 1, true);
-        				im.setLore(lore);
-        				is.setItemMeta(im);
-        				i.clear(x);
-        				i.setItem(x, is);
-        				stack = is;
+        				ItemStack pearlStack = generatePearlItem(pp);
+        				i.setItem(x, pearlStack);
+        				stack = pearlStack;
         				break;
         			}
         		}
@@ -741,7 +693,7 @@ public class PrisonPearlManager {
 		else {
 			lore.add(ChatColor.BLUE + "Imprisoned a long time ago");
 		}
-		lore.add("Unique: " + pp.getUniqueIdentifier());
+		lore.add(ChatColor.DARK_GREEN + "Unique: " + pp.getUniqueIdentifier());
 		im.setLore(lore);
 		im.addEnchant(Enchantment.DURABILITY, 1, true);
 		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);

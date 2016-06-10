@@ -19,7 +19,7 @@ public interface IPrisonPearlStorage {
 	public boolean isImprisoned(UUID uuid);
 	public boolean isImprisoned(Player p);
 	public Integer getImprisonedCount(UUID[] ids);
-	public UUID[] getImprisonedIds(UUID[] ids);
+	public Collection <UUID> getImprisonedIds(UUID[] ids);
 	public void updateLastFeed(long lastFeed);
 	public long getLastFeed();
 	public PrisonPearl getByImprisoned(Player player);

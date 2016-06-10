@@ -61,11 +61,13 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	}
 	
 	private void updateTables() {
-		PreparedStatement getDBVersion = db.prepareStatement("select max(db_version) as db_version from db_version where plugin_name=PrisonPearl");
-		PreparedStatement updateVersion = db.prepareStatement("insert into db_version (db_version, update_time, plugin_name) values (?,?,PrisonPearl)"); 
+		PreparedStatement getDBVersion = db.prepareStatement("select max(db_version) from db_version where plugin_name=?;");
+		PreparedStatement updateVersion = db.prepareStatement("insert into db_version (db_version, update_time, plugin_name) values(?,?,?);"); 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		int version = -1;
 		try {
+			getDBVersion.setString(1, "PrisonPearl");
+			updateVersion.setString(3, "PrisonPearl");
 			ResultSet set = getDBVersion.executeQuery();
 			if (set.next()) {
 				version = set.getInt(1);
@@ -85,7 +87,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		if (version == 0) {
 			PrisonPearlPlugin.getInstance().info("Updating database to version 1");
 			db.execute("alter table PrisonPearls add killer varchar(36)");
-			db.execute("alter table PrisonPearls add pearlTime bigint");
+			db.execute("alter table PrisonPearls add pearlTime bigint default -1");
 			version = 1;
 			try {
 				updateVersion.setInt(1, 1);
@@ -315,19 +317,14 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 	}
 	
 	@Override
-	public UUID[] getImprisonedIds(UUID[] ids) {
+	public Collection <UUID> getImprisonedIds(UUID[] ids) {
 		List<UUID> imdIds = new ArrayList<UUID>();
 		for (UUID id : ids) {
 			if (isImprisoned(id)) {
 				imdIds.add(id);
 			}
 		}
-		int count = imdIds.size();
-		UUID[] results = new UUID[count];
-		for (int i = 0; i < count; i++) {
-			results[i] = imdIds.get(i);
-		}
-		return results;
+		return imdIds;
 	}
 	
 	@Override

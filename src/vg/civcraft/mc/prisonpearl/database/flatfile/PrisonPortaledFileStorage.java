@@ -69,6 +69,10 @@ public class PrisonPortaledFileStorage implements IPrisonPortaledStorage{
 
 	@Override
 	public void load() {
+		if (!file.exists()) {
+			PrisonPearlPlugin.getInstance().warning("Found no portaled players file, none were loaded");
+			return;
+		}
 		try {
 			FileInputStream fis = new FileInputStream(file);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));

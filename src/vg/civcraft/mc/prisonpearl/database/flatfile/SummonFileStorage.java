@@ -92,12 +92,19 @@ public class SummonFileStorage implements ISummonStorage{
 
 	@Override
 	public void load() {
+		if (!file.exists()) {
+			PrisonPearlPlugin.getInstance().warning("Found no summoned players file, none were loaded");
+			return;
+		}
 		try {
 			FileInputStream fis = new FileInputStream(file);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 			
 			String line;
 			while ((line = br.readLine()) != null) {
+				if (line.trim().equals("")) {
+					continue;
+				}
 				String[] parts = line.split(" ");
 				String idString = parts[0];
 				Location loc = new Location(Bukkit.getWorld(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));

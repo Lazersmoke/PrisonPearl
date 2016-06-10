@@ -9,11 +9,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -60,8 +62,13 @@ public class PrisonPearlFileStorage implements IPrisonPearlStorage{
 	@Override
 	public void load() {
 		if (oldStorageFile.exists()) {
+			PrisonPearlPlugin.getInstance().info("Found old storage file, loading pearls from there instead of the main file");
 			loadOld();
 			oldStorageFile.delete();
+			return;
+		}
+		if (!storageFile.exists()) {
+			PrisonPearlPlugin.getInstance().warning("Found no storage file, no pearls were loaded");
 			return;
 		}
 		YamlConfiguration config = YamlConfiguration
@@ -95,7 +102,12 @@ public class PrisonPearlFileStorage implements IPrisonPearlStorage{
 				else {
 					imprisonedName = Bukkit.getOfflinePlayer(imprisonedUUID).getName();
 				}
-				Location loc = new Location(Bukkit.getWorld(world), x, y, z);
+				World w = Bukkit.getWorld(world);
+				if (w == null) {
+					PrisonPearlPlugin.getInstance().warning("World in which " + imprisonedUUID + " was pearled no longer exists, failed to load the pearl");
+					continue;
+				}
+				Location loc = new Location(w, x, y, z);
 				PrisonPearl pp = PrisonPearl.makeFromLocation(imprisonedName, imprisonedUUID, loc, uniqueCount, killerUUID, imprisonTime);
 				pp.setMotd(motd);
 				addPearl(pp);
@@ -150,41 +162,48 @@ public class PrisonPearlFileStorage implements IPrisonPearlStorage{
 			}
 			fis.close();
 		} catch (NumberFormatException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
 
 	@Override
 	public void save() {
-		if (!storageFile.exists()) {
-			try {
-				storageFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (storageFile.exists()) {
+			//ensure we always start with a new clean yaml
+			storageFile.delete();
+		}
+		try {
+			storageFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		YamlConfiguration config = YamlConfiguration
 				.loadConfiguration(storageFile);
 		ConfigurationSection pearls = config.createSection("pearls");
 		for(PrisonPearl pp : getAllPearls()) {
-			pearls.set("imprisonedUUID", pp.getImprisonedId().toString());
+			ConfigurationSection current = pearls.createSection(pp.getImprisonedId() + pp.getImprisonedName());
+			current.set("imprisonedUUID", pp.getImprisonedId().toString());
 			Location loc = pp.getLocation();
-			pearls.set("location.x", loc.getBlockX());
-			pearls.set("location.y", loc.getBlockY());
-			pearls.set("location.z", loc.getBlockZ());
-			pearls.set("location.world", loc.getWorld().getUID());
-			pearls.set("unique", pp.getUniqueIdentifier());
+			current.set("location.x", loc.getBlockX());
+			current.set("location.y", loc.getBlockY());
+			current.set("location.z", loc.getBlockZ());
+			current.set("location.world", loc.getWorld().getUID().toString());
+			current.set("unique", pp.getUniqueIdentifier());
 			if (pp.getKillerUUID() != null) {
-				pearls.set("killerUUID", pp.getKillerUUID().toString());
+				current.set("killerUUID", pp.getKillerUUID().toString());
 			}
-			pearls.set("imprisonTime", pp.getImprisonTime());
-			pearls.set("motd", pp.getMotd());
+			current.set("imprisonTime", pp.getImprisonTime());
+			current.set("motd", pp.getMotd());
 		}
 		config.set("lastFeed", lastFeed);
+		try {
+		config.save(storageFile);
+		} catch (IOException e) {
+			PrisonPearlPlugin.getInstance().severe("Failed to save pearled player data to file");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -208,8 +227,8 @@ public class PrisonPearlFileStorage implements IPrisonPearlStorage{
 	}
 
 	@Override
-	public UUID[] getImprisonedIds(UUID[] ids) {
-		return (UUID[]) pearls_byimprisoned.keySet().toArray();
+	public Set <UUID> getImprisonedIds(UUID[] ids) {
+		return pearls_byimprisoned.keySet();
 	}
 
 	@Override
