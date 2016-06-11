@@ -1,5 +1,7 @@
 package vg.civcraft.mc.prisonpearl.managers;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,12 +61,13 @@ public abstract class BanManager{
 		int maxImprisonedAlts = PrisonPearlConfig.getMaxAltsAllowed();
 		UUID[] alts = altsList.getAltsArray(id);
 		Integer pearledCount = storage.getImprisonedCount(alts);
-		UUID[] imprisonedNames = storage.getImprisonedIds(alts);
+		Collection <UUID> imprisonedNames = storage.getImprisonedIds(alts);
 		String names = "";
 		String name = NameLayerManager.getName(id);
-		for (int i = 0; i < imprisonedNames.length; i++) {
-			names = names + imprisonedNames[i];
-			if (i < imprisonedNames.length-1) {
+		Iterator <UUID> iter = imprisonedNames.iterator();
+		while (iter.hasNext()) {
+			names = names + iter.next();
+			if (iter.hasNext()) {
 				names = names + ", ";
 			}
 		}

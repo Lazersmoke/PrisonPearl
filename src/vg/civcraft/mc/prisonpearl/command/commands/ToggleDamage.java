@@ -33,7 +33,7 @@ public class ToggleDamage extends PlayerCommand{
 		Player p = (Player) sender;
 		PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 		SummonManager summonManager = PrisonPearlPlugin.getSummonManager();
-		ItemStack is = p.getItemInHand();
+		ItemStack is = p.getInventory().getItemInMainHand();
 		PrisonPearl pearl = null;
 		if (is != null) {
 			pearl = manager.getPearlByItemStack(is);

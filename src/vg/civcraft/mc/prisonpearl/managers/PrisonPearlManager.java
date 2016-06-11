@@ -1,7 +1,11 @@
 package vg.civcraft.mc.prisonpearl.managers;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,39 +13,46 @@ import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.BrewingStand;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Furnace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachment;
 
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
 import vg.civcraft.mc.bettershards.BetterShardsPlugin;
-import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.BedLocation;
-import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
 import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
-import vg.civcraft.mc.civmodcore.annotations.CivConfigs;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
-import vg.civcraft.mc.prisonpearl.PrisonPearlUtil;
 import vg.civcraft.mc.prisonpearl.database.DataBaseHandler;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IPrisonPearlStorage;
 import vg.civcraft.mc.prisonpearl.events.PrisonPearlEvent;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
-
 import static vg.civcraft.mc.prisonpearl.PrisonPearlUtil.*;
 
 public class PrisonPearlManager {
 
-	private boolean isMercury;
+	private boolean isMercuryEnabled;
+	private boolean isWorldBorderEnabled;
 	
 	private AltsListManager altsManager;
 	private BanManager banManager;
@@ -52,7 +63,8 @@ public class PrisonPearlManager {
 	private Map<String, PermissionAttachment> attachments;
 	
 	public PrisonPearlManager() {
-		isMercury = PrisonPearlPlugin.isMercuryEnabled();
+		isMercuryEnabled = PrisonPearlPlugin.isMercuryEnabled();
+		isWorldBorderEnabled = PrisonPearlPlugin.isWorldBorderEnabled();
 		
 		attachments = new HashMap<String, PermissionAttachment>();
 		for (Player player : Bukkit.getOnlinePlayers())
@@ -153,27 +165,14 @@ public class PrisonPearlManager {
 					" uuid: " + pp.getImprisonedId());
 			return false;
 		}
-		if (isMercury)
+		if (isMercuryEnabled)
 			MercuryManager.updateLocationToMercury(pp, PrisonPearlEvent.Type.NEW);
 		pp.markMove();
 
 		// Create the inventory item
-		ItemStack is = new ItemStack(Material.ENDER_PEARL, 1);
-		ItemMeta im = is.getItemMeta();
-		// Rename pearl to that of imprisoned player
-		im.setDisplayName(name);
-		List<String> lore = new ArrayList<String>();
-		// Gives pearl lore that says more info when hovered over
-		lore.add(name + " is held within this pearl");
-		lore.add("UUID: "+pp.getImprisonedId());
-		lore.add("Unique: " + pp.getUniqueIdentifier());
-		// Given enchantment effect (durability used because it doesn't affect pearl behaviour)
-		im.addEnchant(Enchantment.DURABILITY, 1, true);
-		im.setLore(lore);
-		is.setItemMeta(im);
+		ItemStack is = generatePearlItem(pp);
 		// Give it to the imprisoner
 		inv.setItem(pearlnum, is);
-		// Reason for edit: Gives pearl enchantment effect (distinguishable, unstackable) Gives name of prisoner in inventory.
 
 
         //check if imprisoned was imprisoned by themselves
@@ -316,18 +315,6 @@ public class PrisonPearlManager {
 		return attachments.get(p);
 	}
 	
-	private Location fuzzLocation(Location loc) {
-		if (loc == null)
-			return null;
-
-		double rad = Math.random()*Math.PI*2;
-		Location newloc = loc.clone();
-		if (newloc == null)
-			return null;
-		newloc.add(1.2*Math.cos(rad), 1.2*Math.sin(rad), 0);
-		return newloc;
-	}
-	
 	// hill climbing algorithm which attempts to randomly spawn prisoners while actively avoiding pits
 	// the obsidian pillars, or lava.
 	public Location getPrisonSpawnLocation() {
@@ -385,10 +372,6 @@ public class PrisonPearlManager {
 		return false;
 	}
 	
-	public PrisonPearl getPearlByItemStack(ItemStack stack) {
-		return storage.getPearlbyItemStack(stack);
-	}
-	
 	public boolean isImprisoned(UUID uuid) {
 		return storage.isImprisoned(uuid);
 	}
@@ -421,7 +404,351 @@ public class PrisonPearlManager {
 		}
 	}
 	
+	/**
+	 * If pearls havent been fed for at least the configured feed delay on this server, all pearls on this server
+	 * will be fed, which means they consume whatever item is used as upkeep cost and if not a sufficient amount of 
+	 * that item is available, the pearl will be freed
+	 */
 	public void feedPearls() {
-		PrisonPearlPlugin.log(storage.feedPearls(this));
+		String message = "";
+		Collection <PrisonPearl> pearls = storage.getAllPearls();
+
+		long inactive_seconds = PrisonPearlConfig.getIgnoreFeedSecond();
+		long inactive_hours = PrisonPearlConfig.getIngoreFeedHours();
+		long inactive_days = PrisonPearlConfig.getIngoreFeedDays();
+
+		long feedDelay = PrisonPearlConfig.getIgnoreFeedDelay();	//if pearls have been fed in the last x millis it wont feed, defaults to 20 hours
+		if(storage.getLastFeed() >= System.currentTimeMillis() - feedDelay) {
+			PrisonPearlPlugin.log("Pearls have already been fed, not gonna do it again just yet");
+			return;
+		} else {
+			message+="\nSetting last feed time";
+			storage.updateLastFeed(System.currentTimeMillis());
+		}
+		
+		int pearlsfed = 0;
+		int coalfed = 0;
+		int freedpearls = 0;
+		for (PrisonPearl pp : pearls) {
+			final UUID prisonerId = pp.getImprisonedId();
+			removeLegacyPearl(prisonerId);
+			fixMissingPearl(prisonerId);
+			//final String prisoner = Bukkit.getPlayer(prisonerId).getName();
+			Inventory inv[] = new Inventory[2];
+			HolderStateToInventoryResult retval = HolderStateToInventory(pp, inv);
+			Location loc = pp.getLocation();
+			if (loc instanceof FakeLocation) { // Not on server
+				message+="\n" + pp.getImprisonedName() + " was skipped feeding because he is not on the current server.";
+				continue; // Other server will handle feeding
+			}
+			if (retval == HolderStateToInventoryResult.BAD_CONTAINER) {
+				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, container was corrupt.";
+				freePearl(pp, reason);
+				message+="\n freed:"+prisonerId+",reason:"+"badcontainer";
+				freedpearls++;
+				continue;
+			} else if (retval != HolderStateToInventoryResult.SUCCESS) {
+				continue;
+			}
+			else if (isWorldBorderEnabled && PrisonPearlPlugin.getWorldBorderManager().isMaxFeed(loc)){
+				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, was outside max distance.";
+				freePearl(pp, reason);
+				message+="\n freed:"+prisonerId+",reason:"+"maxDistance";
+				freedpearls++;
+				continue;
+			}
+			if (inactive_seconds != 0 || inactive_hours != 0 || inactive_days != 0) {
+				long inactive_time = pp.getImprisonedOfflinePlayer().getLastPlayed();
+				long inactive_millis = inactive_seconds * 1000 + inactive_hours * 3600000 + inactive_days * 86400000;
+				inactive_time += inactive_millis;
+				if (inactive_time <= System.currentTimeMillis()) {
+					// if player has not logged on in the set amount of time than ignore feeding
+					message += "\nnot fed inactive: " + prisonerId;
+					continue;
+				}
+			}
+			message = message + "Pearl Id: " + prisonerId + " in a " + pp.getHolderBlockState().getType();
+			ItemStack requirement = new ItemStack(PrisonPearlConfig.getResourceUpkeepMaterial(), 
+					PrisonPearlConfig.getResourceUpkeepAmount());
+			int requirementSize = requirement.getAmount();
+
+			if(inv[0].containsAtLeast(requirement,requirementSize)) {
+				int pearlnum;
+				pearlnum = inv.length;
+				message = message + "\n Chest contains enough purestrain coal.";
+				inv[0].removeItem(requirement);
+				pearlsfed++;
+				coalfed += requirementSize;
+				message+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
+			} else if(inv[1] != null && inv[1].containsAtLeast(requirement,requirementSize)){
+				message = message + "\n Chest contains enough purestrain coal.";
+				inv[1].removeItem(requirement);
+				pearlsfed++;
+				coalfed += requirementSize;
+				message+="\n fed:" + prisonerId + ",location:"+ pp.describeLocation();
+			} else {
+				message = message + "\n Chest does not contain enough purestrain coal.";
+				String reason = prisonerId + " is being freed. Reason: Freed during coal feed, container did not have enough coal.";
+				freePearl(pp, reason);
+				message+="\n freed:"+prisonerId+",reason:"+"nocoal"+",location:"+pp.describeLocation();
+				freedpearls++;
+			}
+		}
+		message = message + "\n Feeding Complete. " + pearlsfed + " were fed " + coalfed + " coal. " + freedpearls + " players were freed.";
+		PrisonPearlPlugin.log(message);
+	}
+	
+	/**
+	 * Gets the PrisonPearl object of the player imprisoned in the given ItemStack
+	 * @param stack ItemStack to get the PrisonPearl for
+	 * @return PrisonPearl of the player imprisoned in the given ItemStack or null if no player is imprisoned in that item
+	 */
+	public PrisonPearl getPearlByItemStack(ItemStack stack) {
+		if (stack == null || !stack.hasItemMeta() || stack.getType() != Material.ENDER_PEARL)
+    		return null;
+    	if (!stack.getItemMeta().hasLore())
+    		return null;
+    	List<String> lore = stack.getItemMeta().getLore();
+    	if (lore.size() != 5 || !stack.getItemMeta().hasEnchants() || !stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS))
+    		return null;
+    	UUID uuid = UUID.fromString(lore.get(1));
+    	PrisonPearl pp = getByImprisoned(uuid);
+    	if (pp == null){
+    		stack.setItemMeta(null);
+    		return null;
+    	}
+    	int id = Integer.parseInt(lore.get(4).split(" ")[1]);
+    	boolean isValid = uuid.equals(pp.getImprisonedId()) && id == pp.getUniqueIdentifier();
+		if (!isValid) {
+			stack.setItemMeta(null);
+			pp = null;
+		}
+    	return pp;
+	}
+	
+	/**
+	 * Assumes the given player is imprisoned and searches through the inventory his pearl is held in. If that inventory contains
+	 * a pearl, which has the imprisoned players name, but is not a valid pearl after the current criterias, the pearl will be
+	 * deleted so a proper one can be regenerated later on instead
+	 * @param uuid UUID of the imprisoned player
+	 */
+	private void removeLegacyPearl(UUID uuid) {
+		PrisonPearl pp = getByImprisoned(uuid);
+		if (pp == null) {
+			return;
+		}
+		final String prisonerName = NameLayerManager.getName(uuid);
+    	Block b = pp.getLocation().getBlock();
+    	if (!(b.getState() instanceof InventoryHolder)) {
+    		return;
+    	}
+    	Inventory inv = ((InventoryHolder) b.getState()).getInventory();
+    	for(int i = 0; i < inv.getSize() ; i++) {
+    		ItemStack is = inv.getItem(i);
+    		if (isLegacyPearl(is, prisonerName)) {
+    			inv.setItem(i, null);
+    			PrisonPearlPlugin.getInstance().info("Removed legacy pearl holding " + uuid + " at " + b.getLocation());
+    			return;
+    		}
+    	}
+    	
+    	//check for doublechest
+    	if (b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST) {
+    		Block adjacentChest = null;
+    		if (b.getRelative(BlockFace.NORTH).getType() == b.getType()) {
+    			adjacentChest = b.getRelative(BlockFace.NORTH);
+    		}
+    		if (b.getRelative(BlockFace.SOUTH).getType() == b.getType()) {
+    			adjacentChest = b.getRelative(BlockFace.SOUTH);
+    		}
+    		if (b.getRelative(BlockFace.EAST).getType() == b.getType()) {
+    			adjacentChest = b.getRelative(BlockFace.EAST);
+    		}
+    		if (b.getRelative(BlockFace.WEST).getType() == b.getType()) {
+    			adjacentChest = b.getRelative(BlockFace.WEST);
+    		}
+    		if (adjacentChest != null) {
+    			inv = ((InventoryHolder) adjacentChest.getState()).getInventory();
+    			for(int i = 0; i < inv.getSize() ; i++) {
+    	    		ItemStack is = inv.getItem(i);
+    	    		if (isLegacyPearl(is, prisonerName)) {
+    	    			inv.setItem(i, null);
+    	    			PrisonPearlPlugin.getInstance().info("Removed legacy pearl holding " + uuid + " at " + adjacentChest.getLocation());
+    	    			return;
+    	    		}
+    	    	}
+    		}
+    	}
+	}
+	
+	private boolean isLegacyPearl(ItemStack is, String prisonerName) {
+		if (is == null) {
+			return false;
+		}
+		if (is.getType() == Material.ENDER_PEARL && is.hasItemMeta() && is.getItemMeta().hasDisplayName() && 
+				is.getItemMeta().getDisplayName().equals(prisonerName)) {
+			//pearl with the name of the imprisoned player
+			if (getPearlByItemStack(is) == null) {
+				//not a valid pearl the way pearls are currently tracked
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Assumes the given player is imprisoned and regenerates a new pearl item, if the old one is no longer in the inventory block it's supposed
+	 * to be and the block is still an inventory with empty slots to generate the pearl in
+	 * 
+	 * @param uuid UUID of the imprisoned player
+	 */
+	@CivConfig(name = "fixMissingPearls", def = "false", type = CivConfigType.Bool)
+	private void fixMissingPearl(UUID uuid) {
+		if (!plugin.GetConfig().get("fixMissingPearls").getBool())
+    		return;
+    	PrisonPearl pp = getByImprisoned(uuid);
+    	Location loc = pp.getLocation();
+    	Block b = pp.getLocation().getBlock();
+    	Inventory[] inv = new Inventory[2];
+    	BlockState inherentViolence = pp.getHolderBlockState();
+    	// Grabs the inventories.
+    	switch(b.getType()) {
+		case FURNACE:
+			inv[0] = ((Furnace)inherentViolence).getInventory();
+			break;
+		case DISPENSER:
+			inv[0] = ((Dispenser)inherentViolence).getInventory();
+			break;
+		case BREWING_STAND:
+			inv[0] = ((BrewingStand)inherentViolence).getInventory();
+			break;
+		case CHEST:
+		case TRAPPED_CHEST:
+			Chest c = ((Chest)inherentViolence);
+			DoubleChestInventory dblInv = null;
+			try {
+				dblInv = (DoubleChestInventory)c.getInventory();
+				inv[0] = dblInv.getLeftSide();
+				inv[1] = dblInv.getRightSide();
+			} catch(Exception e){
+				inv[0] = c.getInventory();
+			}
+			break;
+		default:
+			inv[0] = null;
+			inv[1] = null;
+		}
+		ItemStack stack = null;
+		// Scans the inventories looking for the prisonpearl.
+    	for (Inventory i: inv) {
+    		if (i == null)
+    			continue;
+    		for (int x = 0; x < i.getSize(); x++) {
+    			ItemStack s = i.getItem(x);
+    			if (s == null || s.getType() != Material.ENDER_PEARL)
+    				continue;
+    			PrisonPearl tmp = getPearlByItemStack(s);
+    			if (tmp == null)
+    				continue;
+    			if (tmp.getImprisonedId().equals(uuid)) {
+    				stack = s;
+    				break;
+    			}
+    		}
+    		if (stack != null)
+    			break;
+    	}
+    	if (stack == null)
+    		for (Inventory i: inv) {
+            	if (stack != null)
+        			break;
+        		for (int x = 0; x < i.getSize(); x++) {
+        			ItemStack current = i.getItem(x);
+        			if (current == null) {
+        				storage.removePearl(pp, "Regenerating pearl cause it was lost. UUID is: " + pp.getImprisonedId().toString());
+        				String name = NameLayerManager.getName(uuid);
+        				pp = new PrisonPearl(name, uuid, loc, new Random().nextInt(1000), pp.getKillerUUID(), pp.getImprisonTime());
+        				addPearl(pp);
+        				ItemStack pearlStack = generatePearlItem(pp);
+        				i.setItem(x, pearlStack);
+        				stack = pearlStack;
+        				break;
+        			}
+        		}
+    		}
+	}
+	
+	private ItemStack generatePearlItem(PrisonPearl pp) {
+		ItemStack is = new ItemStack(Material.ENDER_PEARL);
+		ItemMeta im = is.getItemMeta();
+		im.setDisplayName(ChatColor.GOLD + pp.getImprisonedName());
+		List <String> lore = new LinkedList<String>();
+		lore.add(ChatColor.GOLD + pp.getImprisonedName() + ChatColor.RESET + " is held in this pearl");
+		lore.add(pp.getImprisonedId().toString());
+		lore.add(ChatColor.RESET + "Killed by " + ChatColor.GOLD + pp.getKillerName());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if (pp.getImprisonTime() != -1) {
+			lore.add(ChatColor.BLUE + "Imprisoned " + sdf.format(new Date(pp.getImprisonTime())));
+		}
+		else {
+			lore.add(ChatColor.BLUE + "Imprisoned a long time ago");
+		}
+		lore.add(ChatColor.DARK_GREEN + "Unique: " + pp.getUniqueIdentifier());
+		im.setLore(lore);
+		im.addEnchant(Enchantment.DURABILITY, 1, true);
+		im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		is.setItemMeta(im);
+		return is;
+	}
+	
+	private HolderStateToInventoryResult HolderStateToInventory(PrisonPearl pp, Inventory[] inv) {
+		if (pp == null || inv == null) {
+			return HolderStateToInventoryResult.BAD_PARAMETER;
+		}
+		BlockState inherentViolence = pp.getHolderBlockState();
+//		if (Bukkit.getPluginManager().isPluginEnabled("EnderExpansion")){
+//			if (pp.getLocation().getBlock().getType() == Material.ENDER_CHEST){
+//				inv[0] = Enderplugin.getchestInventory(pp.getLocation());
+//				return HolderStateToInventoryResult.SUCCESS;
+//			}
+//		}
+		if (inherentViolence == null) {
+			return HolderStateToInventoryResult.NULL_STATE;
+		}
+		Material mat = inherentViolence.getType();
+		
+		switch(mat) {
+		case FURNACE:
+			inv[0] = ((Furnace)inherentViolence).getInventory();
+			break;
+		case DISPENSER:
+			inv[0] = ((Dispenser)inherentViolence).getInventory();
+			break;
+		case BREWING_STAND:
+			inv[0] = ((BrewingStand)inherentViolence).getInventory();
+			break;
+		case CHEST:
+		case TRAPPED_CHEST:
+			Chest c = ((Chest)inherentViolence);
+			DoubleChestInventory dblInv = null;
+			try {
+				dblInv = (DoubleChestInventory)c.getInventory();
+				inv[0] = dblInv.getLeftSide();
+				inv[1] = dblInv.getRightSide();
+			} catch(Exception e){
+				inv[0] = c.getInventory();
+			}
+			break;
+		default:
+			return HolderStateToInventoryResult.BAD_CONTAINER;
+		}
+		if (inv[0] == null && inv[1] == null) {
+			return HolderStateToInventoryResult.NULL_INVENTORY;
+		}
+		return HolderStateToInventoryResult.SUCCESS;
+	}
+	
+	private enum HolderStateToInventoryResult {
+		SUCCESS, BAD_PARAMETER, NULL_STATE, BAD_CONTAINER, NULL_INVENTORY
 	}
 }

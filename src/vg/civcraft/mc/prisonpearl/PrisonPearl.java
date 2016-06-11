@@ -21,6 +21,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
@@ -66,6 +67,8 @@ public class PrisonPearl {
 	private LinkedList<Holder> holders = new LinkedList<Holder>();
 	private final String imprisonedName;
 	private final UUID imprisonedId;
+	private final UUID killedUUID;
+	private final long imprisonTime;
 	private String motd = "";
 	private boolean pearlOnCursor = false;
 	private long lastMoved = 0;
@@ -73,36 +76,42 @@ public class PrisonPearl {
 	private PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
 
 	public PrisonPearl(String imprisonedName, UUID imprisonedId,
-			Player holderplayer, int unique) {
+			Player holderplayer, int unique, UUID killer, long imprisonTime) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(holderplayer));
 		this.unique = unique;
+		this.killedUUID = killer;
+		this.imprisonTime = imprisonTime;
 	}
 
 	public PrisonPearl(String imprisonedName, UUID imprisonedId,
-			Location blocklocation, int unique) {
+			Location blocklocation, int unique, UUID killer, long imprisonTime) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
 		this.unique = unique;
+		this.killedUUID = killer;
+		this.imprisonTime = imprisonTime;
 	}
 
 	public PrisonPearl(String imprisonedName, UUID imprisonedId,
-			FakeLocation blocklocation, int unique) {
+			FakeLocation blocklocation, int unique, UUID killer, long imprisonTime) {
 		this.imprisonedName = imprisonedName;
 		this.imprisonedId = imprisonedId;
 		this.holders.addFirst(new Holder(blocklocation));
 		this.unique = unique;
+		this.killedUUID = killer;
+		this.imprisonTime = imprisonTime;
 	}
 
 	public static PrisonPearl makeFromLocation(String imprisonedName,
-			UUID imprisonedId, Location loc, int unique) {
+			UUID imprisonedId, Location loc, int unique, UUID killer, long imprisonTime) {
 		if (imprisonedId == null || loc == null)
 			return null;
 		BlockState bs = loc.getBlock().getState();
 		if (bs instanceof InventoryHolder)
-			return new PrisonPearl(imprisonedName, imprisonedId, loc, unique);
+			return new PrisonPearl(imprisonedName, imprisonedId, loc, unique, killer, imprisonTime);
 		else
 			return null;
 	}
@@ -480,5 +489,25 @@ public class PrisonPearl {
     
     public int getUniqueIdentifier() {
     	return unique;
+    }
+    
+    public UUID getKillerUUID() {
+    	return killedUUID;
+    }
+    
+    public String getKillerName() {
+    	if (killedUUID == null) {
+    		return "Unknown player";
+    	}
+    	if (PrisonPearlPlugin.isNameLayerEnabled()) {
+    		return NameAPI.getCurrentName(killedUUID);
+    	}
+    	else {
+    		return Bukkit.getOfflinePlayer(killedUUID).getName();
+    	}
+    }
+    
+    public long getImprisonTime() {
+    	return imprisonTime;
     }
 }

@@ -30,7 +30,7 @@ public class Kill extends PlayerCommand {
 		}
 		Player p = (Player) sender;
 		PrisonPearlManager manager = PrisonPearlPlugin.getPrisonPearlManager();
-		ItemStack is = p.getItemInHand();
+		ItemStack is = p.getInventory().getItemInMainHand();
 		PrisonPearl pearl = null;
 		if (is != null) {
 			pearl = manager.getPearlByItemStack(is);

@@ -10,10 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import vg.civcraft.mc.bettershards.BetterShardsAPI;
-import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
-import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
-import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.mercury.events.AsyncPluginBroadcastMessageEvent;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
@@ -84,12 +80,23 @@ public class MercuryListener implements Listener{
 		loc = new FakeLocation(message[3], Double.parseDouble(message[4]), Double.parseDouble(message[5]),
 				Double.parseDouble(message[6]), server, name);
 		int unique = Integer.parseInt(message[7]);
-		String motd = null;
-		if (message.length == 10)
-			motd = message[9];
-		
+		String motd;
+		if (message [9].equals("null")) {
+			motd = null;
+		}
+		else {
+			motd = message [9];
+		}
+		UUID killerUUID;
+		if (message [10].equals("null")) {
+			killerUUID = null;
+		}
+		else {
+			killerUUID = UUID.fromString(message [10]);
+		}
+		long imprisonTime = Long.parseLong(message [11]);
 		if (type.equals(PrisonPearlEvent.Type.NEW)) {
-			PrisonPearl pp = new PrisonPearl(name, id, loc, unique);
+			PrisonPearl pp = new PrisonPearl(name, id, loc, unique, killerUUID, imprisonTime);
 			pp.setMotd(motd);
 			pp.setHolder(loc);
 			pp.markMove();

@@ -1,7 +1,6 @@
 package vg.civcraft.mc.prisonpearl.command.commands;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 

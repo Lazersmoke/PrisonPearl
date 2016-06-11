@@ -1,23 +1,17 @@
 package vg.civcraft.mc.prisonpearl.managers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
-import vg.civcraft.mc.prisonpearl.events.AltsListEvent;
 import vg.civcraft.mc.prisonpearl.events.RequestAltsListEvent;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 

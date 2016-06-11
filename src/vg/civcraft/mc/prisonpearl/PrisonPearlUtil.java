@@ -19,7 +19,6 @@ import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
 import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
-import vg.civcraft.mc.prisonpearl.managers.PrisonPortaledPlayerManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
@@ -27,7 +26,6 @@ public class PrisonPearlUtil {
 
 	private static PrisonPearlManager manager;
 	private static SummonManager summon;
-	private static PrisonPortaledPlayerManager portaled;
 	
 	private static Thread mainThread;
 	
@@ -96,7 +94,6 @@ public class PrisonPearlUtil {
 						BetterShardsAPI.randomSpawnPlayer(toServer, p.getUniqueId());
 						return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 					} catch (PlayerStillDeadException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -138,12 +135,11 @@ public class PrisonPearlUtil {
 					}
 					// Randomly respawn the player on the server where the pearl was located.
 					Random r = new Random();
-					int num = r.nextInt(MercuryAPI.getAllConnectedServers().size());
+					int num = r.nextInt(Math.max(1, MercuryAPI.getAllConnectedServers().size()));
 					BetterShardsAPI.randomSpawnPlayer((String) MercuryAPI.getAllConnectedServers().toArray()[num], uuid);
 					return true;
 				}
 			} catch (PlayerStillDeadException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return false;

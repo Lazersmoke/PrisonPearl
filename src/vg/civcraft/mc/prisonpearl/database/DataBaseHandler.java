@@ -1,10 +1,8 @@
 package vg.civcraft.mc.prisonpearl.database;
 
-import vg.civcraft.mc.civmodcore.Config;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
-import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.database.flatfile.FlatFileHandler;
 import vg.civcraft.mc.prisonpearl.database.interfaces.ISaveLoad;
 import vg.civcraft.mc.prisonpearl.database.interfaces.IStorageHandler;
@@ -23,15 +21,10 @@ public class DataBaseHandler {
 		MYSQL;
 	};
 	
-	private PrisonPearlPlugin plugin;
-	private Config config;
-	
 	private ISaveLoad saveLoad;
 	private IStorageHandler storageHandler;
 	
 	public DataBaseHandler() {
-		plugin = PrisonPearlPlugin.getInstance();
-		config = plugin.GetConfig();
 		DbType type = getDataBaseType();
 		if (type == DbType.FLATFILE)
 			handleFlatFile();
