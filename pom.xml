@@ -5,7 +5,7 @@
 	<groupId>com.untamedears</groupId>
 	<artifactId>PrisonPearl</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.70</version>
+	<version>3.0.80</version>
 	<name>PrisonPearl</name>
 	<url>https://github.com/Civcraft/PrisonPearl</url>
 
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>Spigot</artifactId>
-			<version>1.9</version>
+			<version>1.10</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
