@@ -144,7 +144,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 			addPearl.setInt(6, pp.getLocation().getBlockZ());
 			addPearl.setInt(7, pp.getUniqueIdentifier());
 			addPearl.setString(8, pp.getMotd());
-			addPearl.setString(9, pp.getKillerUUID().toString());
+			addPearl.setString(9, pp.getKillerUUID() == null ? null : pp.getKillerUUID().toString());
 			addPearl.setLong(10, pp.getImprisonTime());
 			addPearl.execute();
 			pearls.put(pp.getImprisonedId(), pp);
