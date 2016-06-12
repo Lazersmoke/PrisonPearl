@@ -537,6 +537,9 @@ public class PrisonPearlManager {
 		if (pp == null) {
 			return;
 		}
+		if (pp.getLocation() == null) {
+			return;
+		}
 		final String prisonerName = NameLayerManager.getName(uuid);
     	Block b = pp.getLocation().getBlock();
     	if (!(b.getState() instanceof InventoryHolder)) {
