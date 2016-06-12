@@ -611,6 +611,9 @@ public class PrisonPearlManager {
     		return;
     	PrisonPearl pp = getByImprisoned(uuid);
     	Location loc = pp.getLocation();
+    	if (loc instanceof FakeLocation) {
+    		return;
+    	}
     	Block b = pp.getLocation().getBlock();
     	Inventory[] inv = new Inventory[2];
     	BlockState inherentViolence = pp.getHolderBlockState();
