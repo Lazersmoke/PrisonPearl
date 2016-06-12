@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class PrisonPearlFileStorage implements IPrisonPearlStorage{
 
 	@Override
 	public Collection<PrisonPearl> getAllPearls() {
-		return pearls_byimprisoned.values();
+		return new ArrayList<PrisonPearl>(pearls_byimprisoned.values());
 	}
 	
 	@Override

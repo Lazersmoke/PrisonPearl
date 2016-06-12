@@ -224,7 +224,7 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 
 	@Override
 	public Collection<PrisonPearl> getAllPearls() {
-		return pearls.values();
+		return new ArrayList<PrisonPearl>(pearls.values());
 	}
 
 	@Override
