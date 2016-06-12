@@ -537,7 +537,7 @@ public class PrisonPearlManager {
 		if (pp == null) {
 			return;
 		}
-		if (pp.getLocation() == null) {
+		if (pp.getLocation() instanceof FakeLocation) {
 			return;
 		}
 		final String prisonerName = NameLayerManager.getName(uuid);
