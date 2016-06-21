@@ -8,3 +8,4 @@ craftbukkit.jar
 /target
 .classpath
 .settings/*
+.project
