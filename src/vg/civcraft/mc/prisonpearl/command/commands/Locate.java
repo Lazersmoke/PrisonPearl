@@ -14,6 +14,7 @@ import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
 import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
+import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class Locate extends PlayerCommand{
 
@@ -46,9 +47,9 @@ public class Locate extends PlayerCommand{
 		if (!pearl.verifyLocation() && manager.freePearl(pearl, String.format("Prison Pearl %s could not authenticate.", pearl.getImprisonedId().toString()))) {
 			return true;
 		}
-		if (PrisonPearlPlugin.isMercuryEnabled() && (pearl.getLastMoved() + 3000 < System.currentTimeMillis())) { 
+		if (PrisonPearlPlugin.isMercuryEnabled() && (pearl.getLastMoved() + 3000 < System.currentTimeMillis())
+				&& !(pearl.getLocation() instanceof FakeLocation)) { 
 			// if its been more than 3 seconds since last update.
-			p.sendMessage(ChatColor.YELLOW + "Requesting pplocate.");
 			locate.add(pearl);
 			MercuryManager.requestPPLocate(pearl);
 			return true;

@@ -119,6 +119,7 @@ public class MercuryListener implements Listener{
 			PrisonPearl pp = pearls.getByImprisoned(id);
 			if (pp == null)
 				return;
+			pp.setHolder(loc); // So the player is correctly teleported to the right place.
 			pearls.freePearlFromMercury(pp, "This pearl was freed on another server. Removing instance.", server);
 			BroadcastManager broad = PrisonPearlPlugin.getBroadcastManager();
 			List<UUID> uuids = broad.getAllBroadcasters(id);
