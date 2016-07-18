@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.mercury.PlayerDetails;
@@ -83,13 +84,17 @@ public class SummonManager {
 	public void addSummonPlayer(Summon s) {
 		storage.addSummon(s);
 	}
-
+	
 	public boolean returnPlayer(PrisonPearl pearl) {
+		return returnPlayer(pearl, null);
+	}
+
+	public boolean returnPlayer(PrisonPearl pearl, PlayerRespawnEvent event) {
 		Player pearled = pearl.getImprisonedPlayer();
 		if (pearled != null) {
 			Summon s = getSummon(pearl);
 			s.setToBeReturned(true);
-			PrisonPearlUtil.respawnPlayerCorrectly(pearled);
+			PrisonPearlUtil.respawnPlayerCorrectly(pearled, event);
 			if (!(s.getReturnLocation() instanceof FakeLocation)) {
 				s.setToBeReturned(false);
 				storage.removeSummon(s);

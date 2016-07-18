@@ -165,17 +165,10 @@ public class PlayerListener implements Listener {
 		if (pearls.isImprisoned(event.getPlayer())) {
 			PrisonPearlPlugin.doDebug("Player {0} is respawning while pearled.", event.getPlayer().getName());
 			prisonMotd(event.getPlayer());
-			Bukkit.getScheduler().runTask(PrisonPearlPlugin.getInstance(), new Runnable() {
-	
-				@Override
-				public void run() {
-					if (summon.isSummoned(event.getPlayer()))
-						summon.returnPlayer(pearls.getByImprisoned(event.getPlayer()));
-					else
-						respawnPlayerCorrectly(event.getPlayer());
-				}
-				
-			});
+			if (summon.isSummoned(event.getPlayer()))
+				summon.returnPlayer(pearls.getByImprisoned(event.getPlayer()));
+			else
+				respawnPlayerCorrectly(event.getPlayer(), event);
 		}
 	}
 

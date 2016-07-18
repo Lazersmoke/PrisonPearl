@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
 import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
@@ -27,7 +28,7 @@ public class PrisonPearlUtilShards {
 		summon = PrisonPearlPlugin.getSummonManager();
 	}
 	
-	public static boolean respawnPlayerCorrectlyShards(Player p, PrisonPearl passPearl) { 
+	public static boolean respawnPlayerCorrectlyShards(Player p, PrisonPearl passPearl, PlayerRespawnEvent event) { 
 		// We want this method to deal with all cases: Respawn on death, Respawn on summoning, returning,
 		// different shards transport, everything. 
 		
@@ -84,15 +85,22 @@ public class PrisonPearlUtilShards {
 							p.setHealth(0);
 						Location newLoc = s.getReturnLocation();
 						newLoc.setY(newLoc.getY() + 1);
-						p.teleport(newLoc);
+						if (event != null)
+							event.setRespawnLocation(newLoc);
+						else
+							p.teleport(newLoc);
 					} else if (s.isJustCreated()) {
 						if (PrisonPearlConfig.shouldPpsummonClearInventory()) {
 							dropInventory(p, p.getLocation(), PrisonPearlConfig.shouldPpsummonLeavePearls());
 						}
 						p.teleport(s.getPearlLocation());
 					}
-				}else if (!p.getWorld().equals(manager.getPrisonSpawnLocation().getWorld()))
-					p.teleport(manager.getPrisonSpawnLocation());
+				}else if (!p.getWorld().equals(manager.getPrisonSpawnLocation().getWorld())) {
+					if (event != null)
+						event.setRespawnLocation(manager.getPrisonSpawnLocation());
+					else
+						p.teleport(manager.getPrisonSpawnLocation());
+				}
 				return true;
 			}
 		}

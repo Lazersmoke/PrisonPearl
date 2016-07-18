@@ -255,7 +255,7 @@ public class PrisonPearlManager {
 		if (player != null) {
 			Location currentLoc = player.getLocation();
 			if (!player.isDead() && currentLoc.getWorld() == getImprisonWorld()) {
-				respawnPlayerCorrectly(player, pp);
+				respawnPlayerCorrectly(player, pp, null);
 			}
 			
 		}
@@ -423,7 +423,7 @@ public class PrisonPearlManager {
 	public void freePearlFromMercury(PrisonPearl pp, String reason, String server) {
 		storage.removePearl(pp, reason);
 		if (server != null && pp.getImprisonedPlayer() != null) {
-			respawnPlayerCorrectly(pp.getImprisonedPlayer(), pp);
+			respawnPlayerCorrectly(pp.getImprisonedPlayer(), pp, null);
 		}
 	}
 	
