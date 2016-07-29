@@ -3,6 +3,7 @@ package vg.civcraft.mc.prisonpearl;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -32,7 +33,7 @@ public class PrisonPearlUtilShards {
 		// We want this method to deal with all cases: Respawn on death, Respawn on summoning, returning,
 		// different shards transport, everything. 
 		
-		UUID uuid = p.getUniqueId();
+		final UUID uuid = p.getUniqueId();
 		boolean freeToPearl = PrisonPearlConfig.shouldTpPearlOnFree();
 		PrisonPearl pp = manager.getByImprisoned(uuid);
 
@@ -71,9 +72,13 @@ public class PrisonPearlUtilShards {
 							return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
 						}
 					}
-					
-					BetterShardsAPI.randomSpawnPlayer(toServer, p.getUniqueId());
-					return BetterShardsAPI.connectPlayer(p, toServer, PlayerChangeServerReason.PLUGIN);
+					Bukkit.getScheduler().scheduleSyncDelayedTask(PrisonPearlPlugin.getInstance(), new Runnable() {
+						@Override
+						public void run() {
+							BetterShardsAPI.randomSpawnPlayer(manager.getImprisonServer(), uuid);
+						}
+					});
+					return true;
 				} catch (PlayerStillDeadException e) {
 					e.printStackTrace();
 				}
