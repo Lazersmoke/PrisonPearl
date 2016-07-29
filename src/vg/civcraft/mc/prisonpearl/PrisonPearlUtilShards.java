@@ -100,12 +100,15 @@ public class PrisonPearlUtilShards {
 						}
 						p.teleport(s.getPearlLocation());
 					}
-				}else 
-				if (event != null)
-					event.setRespawnLocation(manager.getPrisonSpawnLocation());
-				else
-					p.teleport(manager.getPrisonSpawnLocation());
-				return true;
+				}else {
+        				if (event != null)  {
+        					event.setRespawnLocation(manager.getPrisonSpawnLocation());
+        				}
+        				else {
+        					p.teleport(manager.getPrisonSpawnLocation());
+        				return true;
+        				}
+				}
 			}
 		}
 		try {
