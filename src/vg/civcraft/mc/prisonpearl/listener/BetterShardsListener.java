@@ -42,11 +42,14 @@ public class BetterShardsListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void playerTransferServerEvent(PlayerChangeServerEvent event) {
 		UUID uuid = event.getPlayerUUID();
+
+		if (event.getServerTravelingTo().equals(pearls.getImprisonServer())) {
+			return;
+		}
+
 		PlayerChangeServerReason reason = event.getReason();
-		if ((reason == PlayerChangeServerReason.RANDOMSPAWN || 
-				reason == PlayerChangeServerReason.PORTAL || 
-				reason == PlayerChangeServerReason.BED)
-				&& pearls.isImprisoned(uuid))
+		if ((reason == PlayerChangeServerReason.RANDOMSPAWN || reason == PlayerChangeServerReason.PORTAL
+				|| reason == PlayerChangeServerReason.BED) && pearls.isImprisoned(uuid))
 			event.setCancelled(true);
 	}
 	
