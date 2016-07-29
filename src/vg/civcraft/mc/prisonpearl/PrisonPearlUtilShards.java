@@ -100,12 +100,11 @@ public class PrisonPearlUtilShards {
 						}
 						p.teleport(s.getPearlLocation());
 					}
-				}else if (!p.getWorld().equals(manager.getPrisonSpawnLocation().getWorld())) {
-					if (event != null)
-						event.setRespawnLocation(manager.getPrisonSpawnLocation());
-					else
-						p.teleport(manager.getPrisonSpawnLocation());
-				}
+				}else 
+				if (event != null)
+					event.setRespawnLocation(manager.getPrisonSpawnLocation());
+				else
+					p.teleport(manager.getPrisonSpawnLocation());
 				return true;
 			}
 		}
