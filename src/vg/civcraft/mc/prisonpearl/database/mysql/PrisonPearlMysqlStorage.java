@@ -55,26 +55,23 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 		db.execute("create table if not exists FeedDelay("
 				+ "lastRestart bigint not null default 0,"
 				+ "server varchar(255) not null);");
-		db.execute("create table if not exists db_version (db_version int not null," 
-				+ "update_time varchar(24),"
-				+ "plugin_name varchar(40));");
+		db.execute("create table if not exists db_version (db_version int(11), plugin_name "
+				+ "varchar(40), timestamp datetime default now());");
 	}
 	
 	private void updateTables() {
 		PreparedStatement getDBVersion = db.prepareStatement("select max(db_version) from db_version where plugin_name=?;");
-		PreparedStatement updateVersion = db.prepareStatement("insert into db_version (db_version, update_time, plugin_name) values(?,?,?);"); 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		PreparedStatement updateVersion = db.prepareStatement("insert into db_version (db_version, plugin_name) values(?,?);"); 
 		int version = -1;
 		try {
 			getDBVersion.setString(1, "PrisonPearl");
-			updateVersion.setString(3, "PrisonPearl");
+			updateVersion.setString(2, "PrisonPearl");
 			ResultSet set = getDBVersion.executeQuery();
 			if (set.next()) {
 				version = set.getInt(1);
 			}
 			else {
 				updateVersion.setInt(1, 0);
-				updateVersion.setString(2, sdf.format(new Date()));
 				updateVersion.execute();
 				version = 0;
 			}
@@ -91,7 +88,6 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 			version = 1;
 			try {
 				updateVersion.setInt(1, 1);
-				updateVersion.setString(2, sdf.format(new Date()));
 				updateVersion.execute();
 			} catch (SQLException e) {
 				PrisonPearlPlugin.getInstance().severe("Failed to insert db update to version 1");
