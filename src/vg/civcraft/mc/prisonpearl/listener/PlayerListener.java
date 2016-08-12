@@ -248,7 +248,7 @@ public class PlayerListener implements Listener {
 	}
 	
 	// Drops a pearl when a player leaves.
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerQuitPearlCheck(PlayerQuitEvent event) {
 		Player imprisoner = event.getPlayer();
 		if (combatManager.isCombatTagged(imprisoner) || 
