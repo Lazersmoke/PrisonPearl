@@ -62,7 +62,7 @@
 		</dependency>
 		<dependency>
 			<groupId>vg.civcraft.mc.bettershards</groupId>
-			<artifactId>BetterShards</artifactId>
+			<artifactId>BetterShardsBukkit</artifactId>
 			<version>1.4.46</version>
 			<scope>provided</scope>
 		</dependency>
