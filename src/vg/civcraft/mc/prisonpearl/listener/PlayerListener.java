@@ -252,7 +252,7 @@ public class PlayerListener implements Listener {
 	public void onPlayerQuitPearlCheck(PlayerQuitEvent event) {
 		Player imprisoner = event.getPlayer();
 		if (combatManager.isCombatTagged(imprisoner) || 
-				(PrisonPearlPlugin.isBetterShardsEnabled() && BetterShardsPlugin.getInstance().isPlayerInTransit(imprisoner.getUniqueId()))) { 
+				(PrisonPearlPlugin.isBetterShardsEnabled() && BetterShardsPlugin.getTransitManager().isPlayerInTransit(imprisoner.getUniqueId()))) { 
 			// if player is tagged or if player is transfered to another server.
 			return;
 		}
@@ -287,7 +287,6 @@ public class PlayerListener implements Listener {
 			if (pp == null)
 				continue;
 			
-			final Player player = Bukkit.getPlayer(pp.getImprisonedId());
 			final Entity entity = e;
 			final World world = entity.getWorld();
 			final int chunkX = event.getChunk().getX();
