@@ -71,11 +71,6 @@ commands:
       usage: /ppconfirm [player]
       permission: prisonpearl.normal.ppconfirm
 
-   ppsilence:
-      description: Silence reception of pplocate commands from player
-      usage: /ppsilence player
-      permission: prisonpearl.normal.ppsilence
-
    pploadalts:
       description: reload alt lists from file
       usage: /pploadalts

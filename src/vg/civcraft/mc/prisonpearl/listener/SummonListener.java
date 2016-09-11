@@ -1,6 +1,7 @@
 package vg.civcraft.mc.prisonpearl.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,6 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
@@ -21,12 +23,14 @@ public class SummonListener implements Listener{
 		Bukkit.getPluginManager().registerEvents(this, PrisonPearlPlugin.getInstance());
 	}
 	
-	public void onPlayerDeathEvent(EntityDeathEvent event) {
-		if (!(event.getEntity() instanceof Player))
-			return;
-		Player p = (Player) event.getEntity();
-		if (summon.isSummoned(p))
-			summon.getSummon(p).setToBeReturned(true);
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onPlayerDeathEvent(PlayerRespawnEvent event) {
+		Player p = event.getPlayer();
+		if (summon.isSummoned(p)) {
+			event.getPlayer().sendMessage(ChatColor.GREEN + "You are being returned to your prison.");
+			// The code for respawning the player can be found in the PlayerListener.
+			// If it had it here it would be too difficult for the two to know which to do.
+		}
 	}
 	
 	@EventHandler(priority=EventPriority.NORMAL)

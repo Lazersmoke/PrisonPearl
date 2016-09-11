@@ -1,5 +1,7 @@
 package vg.civcraft.mc.prisonpearl.managers;
 
+import static vg.civcraft.mc.prisonpearl.PrisonPearlUtil.dropInventory;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,14 +13,21 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import vg.civcraft.mc.bettershards.BetterShardsAPI;
+import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
+import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
+import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.mercury.PlayerDetails;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.PrisonPearlUtil;
+import vg.civcraft.mc.prisonpearl.PrisonPearlUtilShards;
 import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.database.interfaces.ISummonStorage;
+import vg.civcraft.mc.prisonpearl.events.SummonEvent;
+import vg.civcraft.mc.prisonpearl.events.SummonEvent.Type;
 import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 public class SummonManager {
@@ -55,23 +64,12 @@ public class SummonManager {
 	 * @param pearl
 	 */
 	public boolean summonPlayer(PrisonPearl pearl) {
-		final Player pearled = pearl.getImprisonedPlayer();
-		if (pearled == null && PrisonPearlPlugin.isMercuryEnabled()) {
-			PlayerDetails details = MercuryAPI.getServerforAccount(pearl.getImprisonedId());
-			if (details != null) {
-				MercuryManager.requestPPSummon(pearl.getImprisonedId());
-				return true;
-			}
-		} else if (pearled != null) {
-			Summon s = new Summon(pearl.getImprisonedId(), pearled.getLocation(), pearl);
-			addSummonPlayer(s); // We need to add the summon now so that respawn method can find the Summon Object.
-			// Fucking turtles right.
-			s.setJustCreated(true);
-			PrisonPearlUtil.respawnPlayerCorrectly(pearled);
-			s.setJustCreated(false);
-			return true;
+		if (PrisonPearlPlugin.isBetterShardsEnabled()) {
+			return PrisonPearlUtilShards.handleSummonedPlayerSummon(pearl);
 		}
-		return false;
+		else {
+			return PrisonPearlUtil.handleSummonedPlayerSummon(pearl);
+		}
 	}
 
 	/**
@@ -79,7 +77,7 @@ public class SummonManager {
 	 * be summoned from another server and only now they came on and we have the
 	 * proper details.
 	 * 
-	 * @param s
+	 * @param s The summoned Player
 	 */
 	public void addSummonPlayer(Summon s) {
 		storage.addSummon(s);
@@ -90,20 +88,12 @@ public class SummonManager {
 	}
 
 	public boolean returnPlayer(PrisonPearl pearl, PlayerRespawnEvent event) {
-		Player pearled = pearl.getImprisonedPlayer();
-		if (pearled != null) {
-			Summon s = getSummon(pearl);
-			s.setToBeReturned(true);
-			PrisonPearlUtil.respawnPlayerCorrectly(pearled, event);
-			if (!(s.getReturnLocation() instanceof FakeLocation)) {
-				s.setToBeReturned(false);
-				storage.removeSummon(s);
-				MercuryManager.returnPPSummon(pearled.getUniqueId());
-				s.setTime(System.currentTimeMillis());
-				return true;
-			}
+		if (PrisonPearlPlugin.isBetterShardsEnabled()) {
+			return PrisonPearlUtilShards.handleSummonedPlayerReturn(pearl, event);
 		}
-		return false;
+		else {
+			return PrisonPearlUtil.handleSummonedPlayerReturn(pearl, event);
+		}
 	}
 
 	public boolean removeSummon(PrisonPearl pearl) {

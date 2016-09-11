@@ -59,12 +59,17 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitTask;
 
 import net.minelink.ctplus.compat.api.NpcIdentity;
+import vg.civcraft.mc.bettershards.BetterShardsAPI;
 import vg.civcraft.mc.bettershards.BetterShardsPlugin;
+import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
+import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
+import vg.civcraft.mc.mercury.MercuryAPI;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
 import vg.civcraft.mc.prisonpearl.PrisonPearlUtil;
+import vg.civcraft.mc.prisonpearl.PrisonPearlUtilShards;
 import vg.civcraft.mc.prisonpearl.Summon;
 import vg.civcraft.mc.prisonpearl.events.PrisonPearlEvent;
 import vg.civcraft.mc.prisonpearl.managers.BanManager;
@@ -75,6 +80,7 @@ import vg.civcraft.mc.prisonpearl.managers.NameLayerManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 import vg.civcraft.mc.prisonpearl.managers.WorldBorderManager;
+import vg.civcraft.mc.prisonpearl.misc.FakeLocation;
 
 import static vg.civcraft.mc.prisonpearl.PrisonPearlUtil.*;
 
@@ -105,23 +111,16 @@ public class PlayerListener implements Listener {
 
 		if (PrisonPearlPlugin.isBetterShardsEnabled()) {
 			// In case a player comes from another server and has a pearl.
-			for (ItemStack stack : player.getInventory().getContents()) {
-				if (stack == null)
-					continue;
-				final PrisonPearl pp = pearls.getPearlByItemStack(stack);
-				if (pp == null)
-					continue;
-				// We want to add a scheduler in case the other server sends a FakeLocation and overrides this.
-				// Issue is because the player doesn't quit on the the previous server until after they join this one.
-				Bukkit.getScheduler().runTaskLater(PrisonPearlPlugin.getInstance(), new Runnable() {
-	
-					@Override
-					public void run() {
-						pp.setHolder(player);
-						pp.markMove();
-					}
-					
-				}, 20);
+			if (BetterShardsPlugin.getTransitManager().isPlayerInArrivalTransit(player.getUniqueId())) {
+				for (ItemStack stack : player.getInventory().getContents()) {
+					if (stack == null)
+						continue;
+					final PrisonPearl pp = pearls.getPearlByItemStack(stack);
+					if (pp == null)
+						continue;
+					pp.setHolder(player);
+					pp.markMove();
+				}
 			}
 		}
 		
@@ -129,11 +128,14 @@ public class PlayerListener implements Listener {
 			return;
 
 		PrisonPearl pp = pearls.getByImprisoned(player);
-		boolean shouldTP = respawnPlayerCorrectly(player);
-		if (shouldTP && pp == null) {
-			player.sendMessage("While away, you were freed!");
-		} else if (pp != null) {
-			prisonMotd(player);
+		if (pp != null) {
+			if (summon.isSummoned(pp)) {
+				return; // They are summoned let them be.  They will either die or not.
+			} else if (PrisonPearlPlugin.isBetterShardsEnabled()) {
+				PrisonPearlUtilShards.playerJoinEventSpawn(player);
+			} else {
+				PrisonPearlUtil.playerJoinEventSpawn(player);
+			}
 		}
 	}
 
@@ -143,11 +145,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 
 		if (pearls.isImprisoned(player) && !summon.isSummoned(player)) { // if in prison but not imprisoned
-			if (respawnPlayerCorrectly(player)) {
-				event.setTo(PrisonPearlPlugin.getPrisonPearlManager().getPrisonSpawnLocation());
-			} else {
-				event.setCancelled(true);
-			}
+			event.setCancelled(true);
 		}
 	}
 
@@ -165,10 +163,12 @@ public class PlayerListener implements Listener {
 		if (pearls.isImprisoned(event.getPlayer())) {
 			PrisonPearlPlugin.doDebug("Player {0} is respawning while pearled.", event.getPlayer().getName());
 			prisonMotd(event.getPlayer());
-			if (summon.isSummoned(event.getPlayer()))
-				summon.returnPlayer(pearls.getByImprisoned(event.getPlayer()));
-			else
-				respawnPlayerCorrectly(event.getPlayer(), event);
+			// Time to teleport player if they are on wrong server.
+			if (PrisonPearlPlugin.isBetterShardsEnabled()) { // Lets spawn them using shard code.
+				PrisonPearlUtilShards.playerRespawnEventSpawn(event.getPlayer(), event);
+			} else { // Spawn them with normal code.
+				PrisonPearlUtil.playerRespawnEventSpawn(event.getPlayer(), event);
+			}
 		}
 	}
 
@@ -251,14 +251,33 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerQuitPearlCheck(PlayerQuitEvent event) {
 		Player imprisoner = event.getPlayer();
-		if (combatManager.isCombatTagged(imprisoner) || 
-				(PrisonPearlPlugin.isBetterShardsEnabled() && BetterShardsPlugin.getTransitManager().isPlayerInTransit(imprisoner.getUniqueId()))) { 
-			// if player is tagged or if player is transfered to another server.
-			return;
-		}
 		Location loc = imprisoner.getLocation();
 		World world = imprisoner.getWorld();
 		Inventory inv = imprisoner.getInventory();
+		if (PrisonPearlPlugin.isBetterShardsEnabled() && BetterShardsPlugin.getTransitManager()
+						.hasTransferredRecently(imprisoner.getUniqueId(), 1500)) {
+			PrisonPearlPlugin.doDebug("The player {0} has quit and is transfering servers.", imprisoner.getName());
+			// If player is transfered to another server.
+			for (Entry<Integer, ? extends ItemStack> entry :
+				inv.all(Material.ENDER_PEARL).entrySet()) {
+				ItemStack item = entry.getValue();
+				PrisonPearl pp = pearls.getPearlByItemStack(item);
+				if (pp == null) {
+					continue;
+				}
+
+				PrisonPearlPlugin.doDebug("Found the pearl of {0} located on {1}.", pp.getImprisonedName(), 
+						imprisoner.getName());
+				pp.setHolder(new FakeLocation(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
+					MercuryAPI.serverName(), imprisoner.getName()));
+			}
+			return;
+		} else if (combatManager.isCombatTagged(imprisoner)) {
+			// If the player is combat tagged lets wait for the entity to despawn to drop the pearl.
+			PrisonPearlPlugin.doDebug("Player {0} quit while combat tagged.", imprisoner.getName());
+			return;
+		}
+		PrisonPearlPlugin.doDebug("Player {0} quit and is now dropping pearl.", imprisoner.getName());
 		for (Entry<Integer, ? extends ItemStack> entry :
 				inv.all(Material.ENDER_PEARL).entrySet()) {
 			ItemStack item = entry.getValue();
@@ -271,7 +290,6 @@ public class PlayerListener implements Listener {
 			inv.clear(slot);
 			world.dropItemNaturally(loc, item);
 		}
-		imprisoner.saveData();
 	}
 	
 	private Map<UUID, BukkitTask> unloadedPearls = new HashMap<UUID, BukkitTask>();
@@ -355,6 +373,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
+	
 	// Prevent imprisoned players from placing PrisonPearls in their inventory.
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onPrisonPearlClick(InventoryClickEvent event) {
@@ -400,7 +419,7 @@ public class PlayerListener implements Listener {
 				
 				InventoryHolder holder = clickedTop ? event.getView().getTopInventory().getHolder() : event.getView().getBottomInventory().getHolder();
 				if (holder==null){
-					Player player=pearl.getHolderPlayer();
+					pearl.getHolderPlayer();
 					pearl.markMove();
 					// Ender Expansion isn't currently being used anyways.  Not sure if this method will work.
 					//ee.updateEnderStoragePrison(pearl, event, player.getTargetBlock(new HashSet<Material>(), 5).getLocation());
@@ -429,8 +448,9 @@ public class PlayerListener implements Listener {
 				
 				InventoryHolder holder = !clickedTop ? event.getView().getTopInventory().getHolder() : event.getView().getBottomInventory().getHolder();
 				if (holder==null){
-					Player player=pearl.getHolderPlayer();
-					pearl.markMove();
+					// All legacy code from ender expansion.
+					//pearl.getHolderPlayer();
+					//pearl.markMove();
 					//ee.updateEnderStoragePrison(pearl, event, player.getTargetBlock(new HashSet<Material>(), 5).getLocation());
 				}
 				else if(holder.getInventory().firstEmpty() >= 0) {
