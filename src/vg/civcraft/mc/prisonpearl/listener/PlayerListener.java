@@ -255,7 +255,7 @@ public class PlayerListener implements Listener {
 		World world = imprisoner.getWorld();
 		Inventory inv = imprisoner.getInventory();
 		if (PrisonPearlPlugin.isBetterShardsEnabled() && BetterShardsPlugin.getTransitManager()
-						.hasTransferredRecently(imprisoner.getUniqueId(), 1500)) {
+						.hasTransferredRecently(imprisoner.getUniqueId(), 3000)) {
 			PrisonPearlPlugin.doDebug("The player {0} has quit and is transfering servers.", imprisoner.getName());
 			// If player is transfered to another server.
 			for (Entry<Integer, ? extends ItemStack> entry :
