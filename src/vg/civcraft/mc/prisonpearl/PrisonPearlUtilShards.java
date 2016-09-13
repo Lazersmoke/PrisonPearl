@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import vg.civcraft.mc.bettershards.BetterShardsAPI;
+import vg.civcraft.mc.bettershards.BetterShardsPlugin;
 import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
 import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
 import vg.civcraft.mc.bettershards.misc.TeleportInfo;
@@ -56,7 +57,7 @@ public class PrisonPearlUtilShards {
 			PrisonPearlPlugin.doDebug("The player {0} was on the right server but"
 					+ "wrong world, now teleporting to world {1}", 
 					player.getName(), pearls.getImprisonWorldName());
-			event.setRespawnLocation(pearls.getImprisonWorld().getSpawnLocation());
+			event.setRespawnLocation(BetterShardsPlugin.getRandomSpawn().getLocation()); // Get random location from BetterShards.
 		}
 	}
 	
