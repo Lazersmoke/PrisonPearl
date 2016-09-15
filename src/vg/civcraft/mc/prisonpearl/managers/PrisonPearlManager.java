@@ -35,12 +35,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachment;
 
-import vg.civcraft.mc.bettershards.BetterShardsAPI;
-import vg.civcraft.mc.bettershards.BetterShardsPlugin;
-import vg.civcraft.mc.bettershards.events.PlayerChangeServerReason;
-import vg.civcraft.mc.bettershards.misc.BedLocation;
-import vg.civcraft.mc.bettershards.misc.PlayerStillDeadException;
-import vg.civcraft.mc.bettershards.misc.TeleportInfo;
 import vg.civcraft.mc.civmodcore.annotations.CivConfig;
 import vg.civcraft.mc.civmodcore.annotations.CivConfigType;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
@@ -55,6 +49,7 @@ import static vg.civcraft.mc.prisonpearl.PrisonPearlUtil.*;
 public class PrisonPearlManager {
 
 	private boolean isMercuryEnabled;
+	private boolean isBetterShardsEnabled;
 	private boolean isWorldBorderEnabled;
 	
 	private AltsListManager altsManager;
@@ -67,6 +62,7 @@ public class PrisonPearlManager {
 	
 	public PrisonPearlManager() {
 		isMercuryEnabled = PrisonPearlPlugin.isMercuryEnabled();
+		isBetterShardsEnabled = PrisonPearlPlugin.isBetterShardsEnabled();
 		isWorldBorderEnabled = PrisonPearlPlugin.isWorldBorderEnabled();
 		
 		attachments = new HashMap<String, PermissionAttachment>();
@@ -191,14 +187,8 @@ public class PrisonPearlManager {
 			Player imprisoned = Bukkit.getPlayer(imprisonedId);
 			// clear out the players bed
 			if (imprisoned != null) {
-				if (PrisonPearlPlugin.isBetterShardsEnabled() && PrisonPearlPlugin.isMercuryEnabled()) {
-					if (BetterShardsAPI.hasBed(imprisonedId)) {
-						String worldName = getImprisonWorldName();
-						String server = getImprisonServer();
-						TeleportInfo info = new TeleportInfo(worldName, server, 0, 90, 0);
-						BedLocation bed = new BedLocation(imprisonedId, info);
-						BetterShardsAPI.addBedLocation(imprisonedId, bed);
-					}
+				if (isBetterShardsEnabled && isMercuryEnabled) {
+					BetterShardsManager.resetShardedBed(imprisonedId, getImprisonServer(), getImprisonWorldName());
 				}
 				else {
 					World respawnworld = getImprisonWorld();
@@ -248,6 +238,8 @@ public class PrisonPearlManager {
 				
 			});
 		}
+
+		// TODO: will this fail if mercury isn't loaded so manager fails to load
 		MercuryManager.updateLocationToMercury(pp, PrisonPearlEvent.Type.FREED);
 		
 		PrisonPearlPlugin.getSummonManager().removeSummon(pp);
@@ -346,8 +338,8 @@ public class PrisonPearlManager {
 	// hill climbing algorithm which attempts to randomly spawn prisoners while actively avoiding pits
 	// the obsidian pillars, or lava.
 	public Location getPrisonSpawnLocation() {
-		if (PrisonPearlPlugin.isBetterShardsEnabled()) {
-			return BetterShardsPlugin.getRandomSpawn().getLocation();
+		if (isBetterShardsEnabled) {
+			return BetterShardsManager.getRandomSpawn();
 		}
 		Random rand = new Random();
 		Location loc = getImprisonWorld().getSpawnLocation(); // start at spawn
@@ -427,18 +419,8 @@ public class PrisonPearlManager {
 	
 	public void freePearlFromMercury(PrisonPearl pp, String reason, String server) {
 		storage.removePearl(pp, reason);
-		if (server != null && pp.getImprisonedPlayer() != null) {
-			FakeLocation loc = (FakeLocation) pp.getLocation();
-			// Raise pearl by 1 block.
-			TeleportInfo info = new TeleportInfo(loc.getWorldName(), server, loc.getBlockX(),
-					loc.getBlockY()+1, loc.getBlockZ());
-			BetterShardsAPI.teleportPlayer(loc.getServerName(), pp.getImprisonedId(), info);
-			try {
-				BetterShardsAPI.connectPlayer(pp.getImprisonedPlayer(), server, PlayerChangeServerReason.PLUGIN);
-			} catch (PlayerStillDeadException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (server != null && pp.getImprisonedPlayer() != null && isBetterShardsEnabled) {
+			BetterShardsManager.freePearlCrossServer(pp, reason, server);
 		}
 	}
 	

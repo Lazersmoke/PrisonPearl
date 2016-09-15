@@ -22,6 +22,7 @@ import vg.civcraft.mc.prisonpearl.managers.BroadcastManager;
 import vg.civcraft.mc.prisonpearl.managers.CombatTagManager;
 import vg.civcraft.mc.prisonpearl.managers.DamageLogManager;
 import vg.civcraft.mc.prisonpearl.managers.MercuryManager;
+import vg.civcraft.mc.prisonpearl.managers.BetterShardsManager;
 import vg.civcraft.mc.prisonpearl.managers.NameLayerManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPortaledPlayerManager;
@@ -39,6 +40,7 @@ public class PrisonPearlPlugin extends ACivMod {
 	private static CombatTagManager combatManager;
 	private static DamageLogManager damageManager;
 	private static MercuryManager mercuryManager;
+	private static BetterShardsManager betterShardsManager;
 	private static NameLayerManager namelayerManager;
 	private static WorldBorderManager worldborderManager;
 	private static PrisonPearlManager pearlManager;
@@ -74,7 +76,16 @@ public class PrisonPearlPlugin extends ACivMod {
 		broadManager = new BroadcastManager();
 		combatManager = new CombatTagManager(plugin.getServer(), plugin.getLogger());
 		damageManager = new DamageLogManager();
-		mercuryManager = new MercuryManager();
+		try {
+			mercuryManager = new MercuryManager();
+		} catch (NoClassDefFoundError e) {
+			getLogger().log(Level.WARNING, "MercuryManager failed to load. If Mercury is installed, you have an issue; otherwise, ignore.");
+		}
+		try {
+			betterShardsManager = new BetterShardsManager();
+		} catch (NoClassDefFoundError e) {
+			getLogger().log(Level.WARNING, "BetterShardsManager failed to load. If BetterShards is installed, you have an issue; otherwise, ignore.");
+		}
 		namelayerManager = new NameLayerManager();
 		worldborderManager = new WorldBorderManager();
 		pearlManager = new PrisonPearlManager();
@@ -129,7 +140,11 @@ public class PrisonPearlPlugin extends ACivMod {
 	public static MercuryManager getMercuryManager() {
 		return mercuryManager;
 	}
-	
+
+	public static BetterShardsManager getBetterShardsManager() {
+		return betterShardsManager;
+	}
+
 	public static NameLayerManager getNameLayerManager() {
 		return namelayerManager;
 	}
