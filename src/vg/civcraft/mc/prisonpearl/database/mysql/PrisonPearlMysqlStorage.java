@@ -231,11 +231,14 @@ public class PrisonPearlMysqlStorage implements IPrisonPearlStorage{
 			return;
 		PreparedStatement updatePearl = db.prepareStatement(this.updatePearl);
 		try {
+			String server = "bukkit";
+			if (isMercuryEnabled)
+				server = MercuryAPI.serverName();
 			updatePearl.setInt(1, loc.getBlockX());
 			updatePearl.setInt(2, loc.getBlockY());
 			updatePearl.setInt(3, loc.getBlockZ());
 			updatePearl.setString(4, loc.getWorld().getName());
-			updatePearl.setString(5, MercuryAPI.serverName());
+			updatePearl.setString(5, server);
 			updatePearl.setString(6, pp.getMotd());
 			updatePearl.setString(7, pp.getImprisonedId().toString());
 			updatePearl.execute();
