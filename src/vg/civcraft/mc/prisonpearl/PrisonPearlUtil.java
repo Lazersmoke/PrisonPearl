@@ -33,6 +33,13 @@ public class PrisonPearlUtil {
 		PrisonPearlManager pearls = PrisonPearlPlugin.getPrisonPearlManager();
 		PrisonPearlPlugin.doDebug("The player {0} is now teleporting to world {1}", 
 				player.getName(), pearls.getImprisonWorldName());
+		if (PrisonPearlPlugin.getSummonManager().isSummoned(player)) {
+			PrisonPearlPlugin.getSummonManager().
+				returnPlayer(PrisonPearlPlugin.getPrisonPearlManager().getByImprisoned(player), event);
+			// Summon method has all the code needed to respawn the player.
+			// So we are done here.
+			return;
+		}
 		event.setRespawnLocation(pearls.getImprisonWorld().getSpawnLocation());
 	}
 	
