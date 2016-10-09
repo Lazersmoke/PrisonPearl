@@ -155,6 +155,8 @@ public class PrisonPearlUtil {
 			} else {
 				pearled.teleport(s.getReturnLocation());
 			}
+			// Remove the summon from the manager.
+			PrisonPearlPlugin.getSummonManager().removeSummon(pearl);
 		}
 		return true;
  	}
