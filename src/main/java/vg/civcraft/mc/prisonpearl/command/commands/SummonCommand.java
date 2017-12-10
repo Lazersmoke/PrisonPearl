@@ -9,12 +9,14 @@ import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.managers.CombatTagManager;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 
 public class SummonCommand extends PlayerCommand{
 
 	private PrisonPearlManager pearls;
+        private static CombatTagManager combatManager;
 	private SummonManager summon;
 	
 	public SummonCommand(String name) {
@@ -25,6 +27,7 @@ public class SummonCommand extends PlayerCommand{
 		setArguments(0, 0);
 		pearls = PrisonPearlPlugin.getPrisonPearlManager();
 		summon = PrisonPearlPlugin.getSummonManager();
+                combatManager = PrisonPearlPlugin.getCombatTagManager();
 	}
 
 	@Override
@@ -41,6 +44,10 @@ public class SummonCommand extends PlayerCommand{
 		}
 		if (summon.isSummoned(pearl)) {
 			p.sendMessage(ChatColor.RED + "That player is already summoned.");
+			return true;
+		}
+		if (combatManager.isEnabled() && combatManager.isCombatTagged(player)) {
+			p.sendMessage(ChatColor.RED + "The player is combat tagged, unable to summon.");
 			return true;
 		}
 		if (!summon.summonPlayer(pearl)) {
