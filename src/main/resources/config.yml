@@ -1,4 +1,5 @@
 free_tppearl: true
+kill_require_summon: true
 autofree_worldborder: true
 prison_musthotbar: true
 prison_stealing: true

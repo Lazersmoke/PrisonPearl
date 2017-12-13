@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.civmodcore.command.PlayerCommand;
 import vg.civcraft.mc.prisonpearl.PrisonPearl;
 import vg.civcraft.mc.prisonpearl.PrisonPearlPlugin;
+import vg.civcraft.mc.prisonpearl.PrisonPearlConfig;
 import vg.civcraft.mc.prisonpearl.managers.PrisonPearlManager;
 
 public class Kill extends PlayerCommand {
@@ -46,6 +47,12 @@ public class Kill extends PlayerCommand {
 					+ "The player held in this pearl is not online");
 			return true;
 		}
+		if (PrisonPearlConfig.requireSummonToKill() && !PrisonPearlPlugin.getSummonManager().isSummoned(imprisoned)) {
+			p.sendMessage(ChatColor.RED
+					+ "The player held in this pearl is not summoned, so they can't be killed");
+			return true;
+		}
+
 		imprisoned.damage(1000000.0); // should be enough
 		imprisoned.sendMessage(ChatColor.YELLOW
 				+ "You were struck down by your imprisoner");

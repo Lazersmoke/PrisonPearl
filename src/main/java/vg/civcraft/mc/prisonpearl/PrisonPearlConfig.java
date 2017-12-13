@@ -62,6 +62,11 @@ public class PrisonPearlConfig {
 	}
 	
 	
+	public static boolean requireSummonToKill() {
+		return PrisonPearlPlugin.getInstance().getConfig().getBoolean("kill_require_summon");
+	}
+	
+	
 	public static boolean shouldPpsummonClearInventory() {
 		return PrisonPearlPlugin.getInstance().getConfig().getBoolean("prison.clearinventoryonsummon");
 	}
