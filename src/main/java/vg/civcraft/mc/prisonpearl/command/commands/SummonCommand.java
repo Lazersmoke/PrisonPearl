@@ -16,7 +16,7 @@ import vg.civcraft.mc.prisonpearl.managers.SummonManager;
 public class SummonCommand extends PlayerCommand{
 
 	private PrisonPearlManager pearls;
-        private static CombatTagManager combatManager;
+	private static CombatTagManager combatManager;
 	private SummonManager summon;
 	
 	public SummonCommand(String name) {
@@ -27,7 +27,7 @@ public class SummonCommand extends PlayerCommand{
 		setArguments(0, 0);
 		pearls = PrisonPearlPlugin.getPrisonPearlManager();
 		summon = PrisonPearlPlugin.getSummonManager();
-                combatManager = PrisonPearlPlugin.getCombatTagManager();
+		combatManager = PrisonPearlPlugin.getCombatTagManager();
 	}
 
 	@Override
